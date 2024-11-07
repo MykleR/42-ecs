@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 compile_commands.json
+tests/
+.objs/
+.cache/
 
 # Object files
 *.o

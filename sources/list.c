@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/06 19:10:22 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/07 14:14:02 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,11 @@ t_list	*list_last(t_list *lst)
 	return (last);
 }
 
-void	list_addback(t_list **lst, t_list *new)
+t_list	*list_addback(t_list *lst, t_list *new)
 {
-	if (!lst)
-		return ;
-	if (*lst)
-		list_last(*lst)->next = new;
-	else
-		*lst = new;
+	if (lst)
+		list_last(lst)->next = new;
+	return (lst);
 }
 
 void	list_clear(t_list **lst, void (*del)(void*))

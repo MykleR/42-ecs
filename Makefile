@@ -6,7 +6,7 @@
 #    By: mrouves <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/08 18:27:35 by mrouves           #+#    #+#              #
-#    Updated: 2024/11/06 19:26:04 by mrouves          ###   ########.fr        #
+#    Updated: 2024/11/07 14:27:35 by mrouves          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ include $(DIR_SOURCES)/sources.mk
 OBJS			:= $(addprefix $(DIR_OBJS)/, $(SOURCES:%.c=%.o))
 
 CC				:= cc
-CFLAGS			:= -Wall -Wextra -Werror
+CFLAGS			:= -Wall -Wextra -Werror -g
 IFLAGS			:= -I $(DIR_HEADERS)
 
 GREEN			= \033[0;32m

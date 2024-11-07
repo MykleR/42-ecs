@@ -6,15 +6,14 @@
 #    By: mrouves <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/29 16:59:36 by mrouves           #+#    #+#              #
-#    Updated: 2024/11/05 22:11:51 by mrouves          ###   ########.fr        #
+#    Updated: 2024/11/07 14:16:02 by mrouves          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SOURCES		:=	ecs_query.c\
 				ecs_entity.c\
 				ecs.c\
-				binary_tree.c\
-				hash_map.c\
+				query_map.c\
 				list.c\
 				utils.c
 

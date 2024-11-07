@@ -1,16 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_calloc.c                                        :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrouves <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/08 20:18:07 by mrouves           #+#    #+#             */
-/*   Updated: 2024/10/17 12:16:28 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/07 16:33:45 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils.h"
+
+void	*ft_memcpy(void *dst, const void *src, size_t n)
+{
+	unsigned char	*d;
+	unsigned char	*s;
+
+	if (!dst && !src)
+		return (NULL);
+	d = (unsigned char *)dst;
+	s = (unsigned char *)src;
+	while (n--)
+		*d++ = *s++;
+	return (dst);
+}
 
 void	*ft_memset(void *s, int c, size_t n)
 {
