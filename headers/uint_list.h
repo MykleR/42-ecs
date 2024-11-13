@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   list.h                                             :+:      :+:    :+:   */
+/*   uint_list.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:03:10 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/08 16:44:48 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/12 21:14:27 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIST_H
-# define LIST_H
+#ifndef UINT_LIST_H
+# define UINT_LIST_H
 
 # include <stdlib.h>
+# include <stdint.h>
 
 typedef struct s_list
 {
-	void			*content;
 	struct s_list	*next;
 	struct s_list	*prev;
+	uint32_t		val;
 }					t_list;
 
-t_list				*list_create(void *content);
-t_list				*list_last(t_list *lst);
-t_list				*list_addback(t_list *lst, t_list *node);
-void				list_clear(t_list **lst, void (*del)(void *));
-void				list_delone(t_list	*lst, void (*del)(void*));
-t_list				*list_find(t_list *lst, void *content);
+void				list_addfront(t_list **lst, uint32_t val);
+void				list_clear(t_list **lst);
+void				list_remove(t_list **lst, uint32_t val);
+uint32_t			list_popfront(t_list **lst);
 
 #endif

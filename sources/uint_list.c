@@ -6,59 +6,42 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/08 16:44:51 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/12 21:57:57 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "list.h"
+#include "uint_list.h"
 
-t_list	*list_create(void *content)
+static t_list	*list_create(uint32_t val, t_list *prev, t_list *next)
 {
 	t_list	*result;
 
 	result = malloc(sizeof(t_list));
 	if (__builtin_expect(result == NULL , 0))
 		return (NULL);
-	result->content = content;
-	result->next = NULL;
-	result->prev = NULL;
+	result->val = val;
+	result->next = next;
+	result->prev = prev;
 	return (result);
 }
 
-t_list	*list_last(t_list *lst)
+void	list_addfront(t_list **lst, uint32_t val)
 {
-	t_list	*last;
+	t_list	*node;
 
-	last = NULL;
-	while (lst)
-	{
-		last = lst;
-		lst = lst->next;
-	}
-	return (last);
-}
-
-t_list	*list_addback(t_list *lst, t_list *new)
-{
-	if (__builtin_expect(new != NULL, 1))
-		new->prev = lst;
-	if (__builtin_expect(lst != NULL, 1))
-		list_last(lst)->next = new;
-	return (lst);
-}
-
-void	list_delone(t_list	*lst, void (*del)(void*))
-{
 	if (__builtin_expect(lst == NULL, 0))
 		return ;
-	if (del)
-		del(lst->content);
-	if (lst->prev)
-		lst->prev->next = lst->next;
-	free(lst);
+	if (*lst == NULL)
+	{
+		*lst = list_create(val, NULL, NULL);
+		return ;
+	}
+	node = list_create(val, NULL, *lst);
+	(*lst)->prev = node;
+	*lst = node;
 }
 
-void	list_clear(t_list **lst, void (*del)(void*))
+void	list_clear(t_list **lst)
 {
 	t_list	*next;
 
@@ -67,16 +50,38 @@ void	list_clear(t_list **lst, void (*del)(void*))
 	while (*lst)
 	{
 		next = (*lst)->next;
-		if (del)
-			del((*lst)->content);
 		free(*lst);
 		*lst = next;
 	}
 }
 
-t_list	*list_find(t_list *lst, void *content)
+void	list_remove(t_list **lst, uint32_t val)
 {
-	while (lst && lst->content != content)
-		lst = lst->next;
-	return (lst);
+	t_list	*node;
+
+	if (__builtin_expect(lst == NULL || *lst == NULL, 0))
+		return ;
+	node = *lst;
+	while (node->val != val)
+		node = node->next;
+	if (!node)
+		return ;
+	if (node == *lst)
+		*lst = node->next;
+	if (node->next)
+		node->next->prev = node->prev;
+	if (node->prev)
+		node->prev->next = node->next;
+	free(node);
+}
+
+uint32_t	list_popfront(t_list **lst)
+{
+	uint32_t	val;
+
+	if (__builtin_expect(lst == NULL, 0))
+		return (-1);
+	val = (*lst)->val;
+	list_remove(lst, val);
+	return (val);
 }

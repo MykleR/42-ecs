@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/08 15:21:48 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/13 14:01:01 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 
 #ifndef DNDEBUG
 # undef ecs_query
+# undef ecs_entity_clone
+# undef ecs_entity_add
+# undef ecs_entity_remove
+# undef ecs_entity_kill
 
 t_list	*__assert_query(t_universe *ecs, uint64_t signature)
 {
@@ -21,48 +25,123 @@ t_list	*__assert_query(t_universe *ecs, uint64_t signature)
 	return (ecs_query(ecs, signature));
 }
 
+uint32_t	__assert_entity_clone(t_universe *ecs, uint32_t id)
+{
+	assert(ecs);
+	assert(id < ECS_ENTITY_CAP);
+	return (ecs_entity_clone(ecs, id));
+}
+
+void	__assert_entity_remove(t_universe *ecs, uint32_t id, uint8_t comp)
+{
+	assert(ecs);
+	assert(id < ecs->entity_cap);
+	assert(comp < ecs->nb_comps);
+	ecs_entity_remove(ecs, id, comp);
+}
+
+void	__assert_entity_add(t_universe *ecs, uint32_t id, uint8_t comp,
+		void *data)
+{
+	assert(ecs);
+	assert(data);
+	assert(id < ECS_ENTITY_CAP);
+	assert(comp < ecs->nb_comps);
+	ecs_entity_add(ecs, id, comp, data);
+}
+
+void	__assert_entity_kill(t_universe *ecs, uint32_t id)
+{
+	assert(id < ecs->entity_cap);
+	ecs_entity_kill(ecs, id);
+}
+
 #endif
-
-static bool	push_entity(t_list *query, uint64_t id)
-{
-	t_list	*node;
-
-	node = list_create((void *)(uintptr_t)(id));
-	if (!node)
-		return (false);
-	list_addback(query, node);
-	return (true);
-}
-
-static bool	fill_query(t_entity *entities, t_list *query, uint64_t signature)
-{
-	size_t		i;
-	t_entity	entity;
-
-	i = 0;
-	while (i < ECS_ENTITY_CAP)
-	{
-		entity = *(entities + i);
-		if (entity.alive && (entity.mask & signature) == signature
-			&& !push_entity(query, i))
-			return (false);
-		i++;
-	}
-	return (true);
-}
 
 t_list	*ecs_query(t_universe *ecs, uint64_t signature)
 {
-	t_list	*query;
-	bool	creates;
+	t_map_entry	*entry;
+	bool		is_new_query;
+	uint32_t	i;
 
-	query = qm_get(ecs->queries, signature);
-	creates = !query;
-	if (creates)
-		query = qm_add(ecs->queries, signature);
-	if (!query)
-		return (NULL);
-	if (creates && !fill_query(ecs->entities, query, signature))
-		return (NULL);
-	return (query);
+	entry = qm_get(ecs->queries, signature, &is_new_query);
+	if (!is_new_query)
+		return (entry->query);
+	i = -1;
+	while (++i < ecs->entity_cap)
+		if (qm_is_inquery(signature, *(ecs->masks + i)))
+			list_addfront(&(entry->query), i);
+	return (entry->query);
 }
+
+uint32_t	ecs_entity_clone(t_universe *ecs, uint32_t id)
+{
+	t_map_entry	*entry;
+	uint32_t	new_id;
+	size_t		i;
+
+	new_id = ecs_entity_create(ecs);
+	ecs->masks[new_id] = ecs->masks[id]; 
+	i = -1;
+	while (++i < ecs->queries->capacity)
+	{
+		entry = ecs->queries->entries + i;
+		if (qm_is_inquery(entry->key, ecs->masks[new_id]))
+			list_addfront(&(entry->query), new_id);
+	}
+	ft_memcpy(ecs_entity_get(ecs, new_id, 0),
+		   ecs_entity_get(ecs, id, 0), ecs->mem_tsize);
+	return (new_id);
+}
+
+void	ecs_entity_add(t_universe *ecs, uint32_t id, uint8_t comp, void *data)
+{
+	t_map_entry	*entry;
+	uint64_t	new_mask;
+	size_t		i;
+
+	i = -1;
+	new_mask = *(ecs->masks + id) | (1 << comp);
+	while (++i < ecs->queries->capacity)
+	{
+		entry = ecs->queries->entries + i;
+		if (qm_is_inquery(entry->key, new_mask) &&
+			!qm_is_inquery(entry->key, ecs->masks[id]))
+			list_addfront(&(entry->query), id);
+	}
+	ft_memcpy(ecs_entity_get(ecs, id, comp), data, ecs->mem_sizes[comp]);
+	*(ecs->masks + id) = new_mask;
+}
+
+void	ecs_entity_remove(t_universe *ecs, uint32_t id, uint8_t comp)
+{
+	t_map_entry	*entry;
+	size_t		i;
+
+	i = -1;
+	ecs->masks[id] &= ~(1 << comp);
+	while (++i < ecs->queries->capacity)
+	{
+		entry = ecs->queries->entries + i;
+		if ((entry->key & (1 << comp)) != 0)
+			list_remove(&(entry->query), id);
+	}
+}
+
+void	ecs_entity_kill(t_universe *ecs, uint32_t id)
+{
+	t_map_entry	*entry;
+	size_t		i;
+
+	i = -1;
+	while (++i < ecs->queries->capacity)
+	{
+		entry = ecs->queries->entries + i;
+		if (qm_is_inquery(entry->key, ecs->masks[id]))
+			list_remove(&(entry->query), id);
+	}
+	ecs->masks[id] = 0;
+	ecs->entity_len--;
+	list_addfront(&(ecs->entity_pool), id);
+}
+

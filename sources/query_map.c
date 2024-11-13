@@ -6,12 +6,11 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/08 16:20:35 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/13 13:44:22 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "query_map.h"
-#include "utils.h"
+#include "ecs.h"
 
 static size_t	next_pow2(size_t n)
 {
@@ -21,8 +20,12 @@ static size_t	next_pow2(size_t n)
 	n |= n >> 4;
 	n |= n >> 8;
 	n |= n >> 16;
-	n |= n >> 32;
 	return (++n);
+}
+
+bool	qm_is_inquery(uint64_t key, uint64_t mask)
+{
+	return (key && (key & mask) == key);
 }
 
 t_query_map	*qm_create(void)
@@ -37,7 +40,6 @@ t_query_map	*qm_create(void)
 	if (__builtin_expect(qm == NULL , 0))
 		return (NULL);
 	ft_memset(qm->entries, 0, sizeof(t_map_entry) * capacity);
-	qm->length = 0;
 	qm->capacity = capacity;
 	return (qm);
 }
@@ -50,51 +52,31 @@ void	qm_destroy(t_query_map *map)
 		return ;
 	i = -1;
 	while (++i < map->capacity)
-		list_clear(&(map->entries[i].query), NULL);
+		list_clear(&(map->entries[i].query));
 	free(map);
 }
 
-t_list	*qm_get(t_query_map *map, uint64_t key)
+t_map_entry	*qm_get(t_query_map *map, uint64_t key, bool *res)
 {
-	uint64_t	index;
-	uint64_t	start;
+	size_t	index;
+	size_t	start;
 
-	if (__builtin_expect(map == NULL , 0))
+	if (__builtin_expect(res != NULL, 1))
+		*res = false;
+	if (__builtin_expect(!map || !key, 0))
 		return (NULL);
 	index = key & (map->capacity - 1);
 	start = index;
 	while (map->entries[index].key != 0)
 	{
 		if (key == map->entries[index].key)
-			return (map->entries[index].query);
+			return (map->entries + index);
 		index = (index + 1) & (map->capacity - 1);
 		if (index == start)
 			return (NULL);
 	}
-	return (NULL);
-}
-
-t_list	*qm_add(t_query_map *map, uint64_t key)
-{
-	uint64_t	index;
-	uint64_t	start;
-
-	if (__builtin_expect(map == NULL , 0))
-		return (NULL);
-	index = key & (map->capacity - 1);
-	start = index;
-	while (map->entries[index].key != 0)
-	{
-		if (key == map->entries[index].key)
-			return (NULL);
-		index = (index + 1) & (map->capacity - 1);
-		if (index == start)
-			return (NULL);
-	}
-	map->entries[index].query = list_create(NULL);
-	if (__builtin_expect(map->entries[index].query == NULL, 0))
-		return (NULL);
+	if (__builtin_expect(res != NULL, 1))
+		*res = true;
 	map->entries[index].key = key;
-	map->length++;
-	return (map->entries[index].query);
+	return (map->entries + index);
 }

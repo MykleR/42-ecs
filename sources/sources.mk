@@ -6,15 +6,14 @@
 #    By: mrouves <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/29 16:59:36 by mrouves           #+#    #+#              #
-#    Updated: 2024/11/08 16:10:54 by mrouves          ###   ########.fr        #
+#    Updated: 2024/11/13 14:38:10 by mrouves          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SOURCES		:=	ecs_query.c\
 				ecs_entity.c\
-				ecs_components.c\
 				ecs.c\
 				query_map.c\
-				list.c\
+				uint_list.c\
 				utils.c
 

@@ -6,51 +6,59 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/08 12:15:51 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/13 14:34:26 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs.h"
 
-static bool	ecs_init_comps(size_t comps[64], uint8_t nb_comps, t_comps *holder)
+static bool	ecs_init_comps(size_t comps[64], uint8_t nb, t_universe *ecs)
 {
-	uint8_t	i;
+	size_t	i;
 
-	i = 0;
-	holder->total_size = 0;
-	holder->nb_comps = nb_comps;
-	ft_memset(holder->offsets, 0, sizeof(size_t) * 64);
-	ft_memset(holder->sizes, 0, sizeof(size_t) * 64);
-	while (i < nb_comps)
+	ecs->mem_tsize = 0;
+	ecs->nb_comps = nb;
+	ecs->data = NULL;
+	ft_memset(ecs->mem_offsets, 0, sizeof(size_t) * 64);
+	ft_memset(ecs->mem_sizes, 0, sizeof(size_t) * 64);
+	i = -1;
+	while (++i < nb)
 	{
 		if (!comps[i])
 			return (false);
-		holder->offsets[i] = holder->total_size;
-		holder->sizes[i] = comps[i];
-		holder->total_size += comps[i];
-		i++;
+		ecs->mem_offsets[i] = ecs->mem_tsize;
+		ecs->mem_sizes[i] = comps[i];
+		ecs->mem_tsize += comps[i];
 	}
-	holder->data = ft_calloc(ECS_ENTITY_CAP, holder->total_size);
-	return (holder->data != NULL);
+	ecs->data = ft_calloc(ecs->entity_cap, ecs->mem_tsize);
+	return (ecs->data != NULL);
 }
 
-t_universe	*ecs_create(size_t comps[64], size_t nb_comps)
+static void ecs_init_pool(t_universe *ecs)
+{
+	uint32_t	id;
+
+	id = ecs->entity_cap;
+	ecs->entity_pool = NULL;
+	while(id--)
+		list_addfront(&ecs->entity_pool, id);
+}
+
+t_universe	*ecs_create(size_t comps[64], size_t nb)
 {
 	t_universe	*ecs;
 
 	ecs = malloc(sizeof(t_universe));
 	if (!ecs)
 		return (NULL);
-	ecs->len_entities = 0;
+	ecs->entity_len = 0;
+	ecs->entity_cap = ECS_ENTITY_CAP;
 	ecs->queries = qm_create();
-	ecs->entities = ft_calloc(ECS_ENTITY_CAP, sizeof(t_entity));
-	if (ecs_init_comps(comps, nb_comps, &(ecs->components))
-		&& ecs->queries && ecs->entities)
+	ecs->masks = ft_calloc(ecs->entity_cap, sizeof(uint64_t));
+	ecs_init_pool(ecs);
+	if (ecs_init_comps(comps, nb, ecs) && ecs->queries && ecs->masks)
 		return (ecs);
-	qm_destroy(ecs->queries);
-	free(ecs->entities);
-	free(ecs->components.data);
-	free(ecs);
+	ecs_destroy(ecs);
 	return (NULL);
 }
 
@@ -59,7 +67,8 @@ void	ecs_destroy(t_universe *ecs)
 	if (!ecs)
 		return ;
 	qm_destroy(ecs->queries);
-	free(ecs->entities);
-	free(ecs->components.data);
+	list_clear(&ecs->entity_pool);
+	free(ecs->masks);
+	free(ecs->data);
 	free(ecs);
 }
