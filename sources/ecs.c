@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/13 14:34:26 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/15 17:18:09 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static void ecs_init_pool(t_universe *ecs)
 	id = ecs->entity_cap;
 	ecs->entity_pool = NULL;
 	while(id--)
-		list_addfront(&ecs->entity_pool, id);
+		list_insert(&ecs->entity_pool, id);
 }
 
 t_universe	*ecs_create(size_t comps[64], size_t nb)

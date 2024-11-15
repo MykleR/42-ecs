@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/13 13:48:39 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/15 17:41:45 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void			qm_destroy(t_query_map *map);
 t_map_entry		*qm_get(t_query_map *map, uint64_t key, bool *res);
 bool			qm_is_inquery(uint64_t key, uint64_t mask);
 
-# ifndef DNDEBUG
+# ifndef NDEBUG
 uint32_t	__assert_entity_create(t_universe *ecs);
 uint32_t	__assert_entity_clone(t_universe *ecs, uint32_t id);
 void		__assert_entity_kill(t_universe *ecs, uint32_t id);

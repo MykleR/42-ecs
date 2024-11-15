@@ -6,13 +6,13 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/13 14:01:01 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/15 17:43:33 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs.h"
 
-#ifndef DNDEBUG
+#ifndef NDEBUG
 # undef ecs_query
 # undef ecs_entity_clone
 # undef ecs_entity_add
@@ -44,7 +44,6 @@ void	__assert_entity_add(t_universe *ecs, uint32_t id, uint8_t comp,
 		void *data)
 {
 	assert(ecs);
-	assert(data);
 	assert(id < ECS_ENTITY_CAP);
 	assert(comp < ecs->nb_comps);
 	ecs_entity_add(ecs, id, comp, data);
@@ -70,7 +69,7 @@ t_list	*ecs_query(t_universe *ecs, uint64_t signature)
 	i = -1;
 	while (++i < ecs->entity_cap)
 		if (qm_is_inquery(signature, *(ecs->masks + i)))
-			list_addfront(&(entry->query), i);
+			list_insert(&(entry->query), i);
 	return (entry->query);
 }
 
@@ -87,7 +86,7 @@ uint32_t	ecs_entity_clone(t_universe *ecs, uint32_t id)
 	{
 		entry = ecs->queries->entries + i;
 		if (qm_is_inquery(entry->key, ecs->masks[new_id]))
-			list_addfront(&(entry->query), new_id);
+			list_insert(&(entry->query), new_id);
 	}
 	ft_memcpy(ecs_entity_get(ecs, new_id, 0),
 		   ecs_entity_get(ecs, id, 0), ecs->mem_tsize);
@@ -107,9 +106,12 @@ void	ecs_entity_add(t_universe *ecs, uint32_t id, uint8_t comp, void *data)
 		entry = ecs->queries->entries + i;
 		if (qm_is_inquery(entry->key, new_mask) &&
 			!qm_is_inquery(entry->key, ecs->masks[id]))
-			list_addfront(&(entry->query), id);
+			list_insert(&(entry->query), id);
 	}
-	ft_memcpy(ecs_entity_get(ecs, id, comp), data, ecs->mem_sizes[comp]);
+	if (data)
+		ft_memcpy(ecs_entity_get(ecs, id, comp), data, ecs->mem_sizes[comp]);
+	else
+		ft_memset(ecs_entity_get(ecs, id, comp), 0, ecs->mem_sizes[comp]);
 	*(ecs->masks + id) = new_mask;
 }
 
@@ -142,6 +144,6 @@ void	ecs_entity_kill(t_universe *ecs, uint32_t id)
 	}
 	ecs->masks[id] = 0;
 	ecs->entity_len--;
-	list_addfront(&(ecs->entity_pool), id);
+	list_insert(&(ecs->entity_pool), id);
 }
 

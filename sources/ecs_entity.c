@@ -6,13 +6,13 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:05 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/13 13:46:45 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/15 17:41:57 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs.h"
 
-#ifndef DNDEBUG
+#ifndef NDEBUG
 # undef ecs_entity_create
 # undef ecs_entity_get
 # undef ecs_entity_has
@@ -47,7 +47,7 @@ uint32_t	ecs_entity_create(t_universe *ecs)
 		ecs->entity_len++;
 		return (list_popfront(&(ecs->entity_pool)));
 	}
-	return (-1);
+	return (ecs->entity_cap - 1);
 }
 
 bool	ecs_entity_has(t_universe *ecs, uint32_t id, uint8_t comp)
