@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:03:10 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/15 17:46:02 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 15:54:23 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,6 @@ void				list_insert(t_list	**lst, uint32_t val);
 void				list_clear(t_list **lst);
 void				list_remove(t_list **lst, uint32_t val);
 uint32_t			list_popfront(t_list **lst);
-uint32_t			list_iter(t_list *lst);
+t_list				*list_iter(t_list *lst, uint32_t	*prev);
 
 #endif

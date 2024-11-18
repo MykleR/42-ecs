@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/18 15:35:06 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 15:57:19 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,26 +44,32 @@ void	list_clear(t_list **lst)
 	}
 }
 
-uint32_t	list_iter(t_list *lst)
+t_list	*list_iter(t_list *lst, uint32_t *prev)
 {
-	static t_list	*node = NULL;
-	static uint32_t index = 0;
+	static uint32_t	index = UINT32_MAX;
 
+	if (__builtin_expect(prev == NULL, 0))
+		return (NULL);
 	if (!lst)
-		return (UINT32_MAX);
-	if (!node)
 	{
-		node = lst;
-		index = node->start;
+		index = UINT32_MAX;
+		*prev = index;
+		return (NULL);
 	}
-	if (index > node->end)
+	if (index == UINT32_MAX)
+		index = lst->start;
+	else
+		index++;
+	if (index > lst->end)
 	{
-		node = node->next;
-		if (!node)
-			return (UINT32_MAX);
-		index = node->start;
+		lst = lst->next;
+		if (lst)
+			index = lst->start;
+		else
+			index = UINT32_MAX;
 	}
-	return (index++);
+	*prev = index;
+	return (lst);
 }
 
 uint32_t	list_popfront(t_list **lst)
