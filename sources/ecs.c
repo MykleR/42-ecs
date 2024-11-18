@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/18 15:22:52 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 16:40:06 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ t_universe	*ecs_create(size_t comps[64], size_t nb)
 	ecs = malloc(sizeof(t_universe));
 	if (!ecs)
 		return (NULL);
-	ft_memset(ecs->masks, 0, ECS_ENTITY_CAP);
+	ft_memset(ecs->masks, 0, ECS_ENTITY_CAP * sizeof(uint64_t));
 	ecs->free_list = NULL;	
 	ecs->entity_len = 0;
 	ecs->queries = qm_create();

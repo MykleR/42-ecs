@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/18 15:39:22 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 17:05:45 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,7 @@ void	ecs_entity_remove(t_universe *ecs, uint32_t id, uint8_t comp)
 
 void	ecs_entity_kill(t_universe *ecs, uint32_t id)
 {
+	t_free_list	*free_list;
 	t_map_entry	*entry;
 	size_t		i;
 
@@ -145,9 +146,10 @@ void	ecs_entity_kill(t_universe *ecs, uint32_t id)
 		if (qm_is_inquery(entry->key, ecs->masks[id]))
 			list_remove(&(entry->query), id);
 	}
-	ecs->masks[id] = 0;
 	ecs->entity_len--;
-	((t_free_list *)ecs->masks + id)->next = ecs->free_list;
-	ecs->free_list = (t_free_list *)(ecs->masks + id);
+	free_list = (t_free_list *)(ecs->masks + id);
+	free_list->next = ecs->free_list;
+	ecs->free_list = free_list;
+	ft_memset(ecs_entity_get(ecs, id, 0), 0, ecs->mem_tsize);
 }
 

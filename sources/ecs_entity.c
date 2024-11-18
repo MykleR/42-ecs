@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:05 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/18 15:34:42 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 16:43:51 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,16 +48,18 @@ bool	__assert_entity_has(t_universe *ecs, uint32_t id, uint8_t comp)
 uint32_t	ecs_entity_create(t_universe *ecs)
 {
 	uint64_t	*ptr;
+	uint64_t	id;
 
 	if (ecs->entity_len >= ECS_ENTITY_CAP)
 		return (ECS_ENTITY_CAP - 1);
 	if (!ecs->free_list)
 		return (ecs->entity_len++);
 	ptr = (uint64_t *)ecs->free_list;
+	id = ptr - ecs->masks;
 	ecs->free_list = ecs->free_list->next;
 	ecs->entity_len++;
-	ft_memset(ptr, 0, ecs->mem_tsize);
-	return (ptr - ecs->masks);
+	*ptr = 0;
+	return (id);
 }
 
 bool	ecs_entity_has(t_universe *ecs, uint32_t id, uint8_t comp)
