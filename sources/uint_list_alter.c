@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 17:06:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/15 17:40:52 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 14:58:27 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static void    list_delone(t_list **lst)
 {
     t_list	*node;
 
-	if (__builtin_expect(lst == NULL || *lst == NULL, 0))
+	if (__builtin_expect(!lst || !(*lst), 0))
 		return ;
 	node = *lst;
 	if (node->next)
@@ -31,7 +31,7 @@ static void		list_fuse_toleft(t_list *lst)
 {
 	t_list	*tmp;
 
-	if (__builtin_expect(!lst || !lst->next, 0))
+	if (__builtin_expect(!lst->next, 0))
 		return ;
 	lst->end = lst->next->end;
 	tmp = lst->next;
@@ -42,8 +42,6 @@ static void		list_split_toright(t_list *lst, uint32_t val)
 {
 	t_list	*next;
 
-	if (__builtin_expect(!lst, 0))
-		return ;
 	next = list_create(val + 1, lst, lst->next);
 	next->end = lst->end;
 	lst->end = val - 1;
@@ -82,7 +80,7 @@ void	list_remove(t_list **lst, uint32_t val)
 {
 	t_list  *node;
 
-	if (__builtin_expect(lst == NULL || *lst == NULL, 0))
+	if (__builtin_expect(lst == NULL, 0))
 		return ;
 	node = *lst;
 	while (node)

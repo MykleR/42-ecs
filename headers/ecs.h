@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/15 17:41:45 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 15:30:58 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,22 @@ typedef struct s_query_map
 	t_map_entry	entries[QM_INIT_SIZE];
 }				t_query_map;
 
+typedef struct s_free_list
+{
+	struct s_free_list	*next;
+}	t_free_list;
+
 // Struct to represent the ecs universe
 typedef struct s_universe
 {
-	t_list		*entity_pool;
-	t_query_map	*queries;
-	uint64_t	*masks;
 	void		*data;
+	t_query_map	*queries;
+	t_free_list	*free_list;
+	uint64_t	masks[ECS_ENTITY_CAP];
 	size_t		mem_offsets[64];
 	size_t		mem_sizes[64];
 	size_t		mem_tsize;
 	uint32_t	entity_len;
-	uint32_t	entity_cap;
 	uint8_t		nb_comps;
 }				t_universe;
 

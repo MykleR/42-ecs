@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/15 17:43:33 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/18 15:33:57 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@
 # undef ecs_entity_add
 # undef ecs_entity_remove
 # undef ecs_entity_kill
+# undef ecs_entity_has
+# undef ecs_entity_create
+# undef ecs_entity_get
 
 t_list	*__assert_query(t_universe *ecs, uint64_t signature)
 {
@@ -35,7 +38,7 @@ uint32_t	__assert_entity_clone(t_universe *ecs, uint32_t id)
 void	__assert_entity_remove(t_universe *ecs, uint32_t id, uint8_t comp)
 {
 	assert(ecs);
-	assert(id < ecs->entity_cap);
+	assert(id < ECS_ENTITY_CAP);
 	assert(comp < ecs->nb_comps);
 	ecs_entity_remove(ecs, id, comp);
 }
@@ -51,7 +54,7 @@ void	__assert_entity_add(t_universe *ecs, uint32_t id, uint8_t comp,
 
 void	__assert_entity_kill(t_universe *ecs, uint32_t id)
 {
-	assert(id < ecs->entity_cap);
+	assert(id < ECS_ENTITY_CAP);
 	ecs_entity_kill(ecs, id);
 }
 
@@ -67,7 +70,7 @@ t_list	*ecs_query(t_universe *ecs, uint64_t signature)
 	if (!is_new_query)
 		return (entry->query);
 	i = -1;
-	while (++i < ecs->entity_cap)
+	while (++i < ECS_ENTITY_CAP)
 		if (qm_is_inquery(signature, *(ecs->masks + i)))
 			list_insert(&(entry->query), i);
 	return (entry->query);
@@ -144,6 +147,7 @@ void	ecs_entity_kill(t_universe *ecs, uint32_t id)
 	}
 	ecs->masks[id] = 0;
 	ecs->entity_len--;
-	list_insert(&(ecs->entity_pool), id);
+	((t_free_list *)ecs->masks + id)->next = ecs->free_list;
+	ecs->free_list = (t_free_list *)(ecs->masks + id);
 }
 
