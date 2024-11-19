@@ -6,33 +6,33 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/18 15:57:19 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 17:01:24 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "uint_list.h"
 
-t_list	*list_create(uint32_t val, t_list *prev, t_list *next)
+t_ecs_ulist	*list_create(uint32_t val, t_ecs_ulist *prev, t_ecs_ulist *next)
 {
-	t_list	*result;
+	t_ecs_ulist	*node;
 
-	result = malloc(sizeof(t_list));
-	if (__builtin_expect(result == NULL , 0))
+	node = malloc(sizeof(t_ecs_ulist));
+	if (__builtin_expect(node == NULL, 0))
 		return (NULL);
-	result->start = val;
-	result->end = val;
+	node->start = val;
+	node->end = val;
 	if (next)
-		next->prev = result;
-	result->next = next;
+		next->prev = node;
+	node->next = next;
 	if (prev)
-		prev->next = result;
-	result->prev = prev;
-	return (result);
+		prev->next = node;
+	node->prev = prev;
+	return (node);
 }
 
-void	list_clear(t_list **lst)
+void	list_clear(t_ecs_ulist **lst)
 {
-	t_list	*next;
+	t_ecs_ulist	*next;
 
 	if (__builtin_expect(lst == NULL, 0))
 		return ;
@@ -44,7 +44,7 @@ void	list_clear(t_list **lst)
 	}
 }
 
-t_list	*list_iter(t_list *lst, uint32_t *prev)
+t_ecs_ulist	*list_iter(t_ecs_ulist *lst, uint32_t *prev)
 {
 	static uint32_t	index = UINT32_MAX;
 
@@ -72,7 +72,7 @@ t_list	*list_iter(t_list *lst, uint32_t *prev)
 	return (lst);
 }
 
-uint32_t	list_popfront(t_list **lst)
+uint32_t	list_popfront(t_ecs_ulist **lst)
 {
 	uint32_t	val;
 

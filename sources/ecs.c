@@ -6,21 +6,21 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/18 16:40:06 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 17:02:09 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs.h"
 
-static bool	ecs_init_comps(size_t comps[64], uint8_t nb, t_universe *ecs)
+static bool	ecs_init_comps(uint16_t comps[64], uint8_t nb, t_ecs *ecs)
 {
-	size_t	i;
+	uint8_t	i;
 
 	ecs->mem_tsize = 0;
 	ecs->nb_comps = nb;
 	ecs->data = NULL;
-	ft_memset(ecs->mem_offsets, 0, sizeof(size_t) * 64);
-	ft_memset(ecs->mem_sizes, 0, sizeof(size_t) * 64);
+	ft_memset(ecs->mem_offsets, 0, sizeof(uint16_t) * 64);
+	ft_memset(ecs->mem_sizes, 0, sizeof(uint16_t) * 64);
 	i = -1;
 	while (++i < nb)
 	{
@@ -34,15 +34,15 @@ static bool	ecs_init_comps(size_t comps[64], uint8_t nb, t_universe *ecs)
 	return (ecs->data != NULL);
 }
 
-t_universe	*ecs_create(size_t comps[64], size_t nb)
+t_ecs	*ecs_create(uint16_t comps[64], uint8_t nb)
 {
-	t_universe	*ecs;
+	t_ecs	*ecs;
 
-	ecs = malloc(sizeof(t_universe));
-	if (!ecs)
+	ecs = malloc(sizeof(t_ecs));
+	if (__builtin_expect(!ecs, 0))
 		return (NULL);
 	ft_memset(ecs->masks, 0, ECS_ENTITY_CAP * sizeof(uint64_t));
-	ecs->free_list = NULL;	
+	ecs->free_list = NULL;
 	ecs->entity_len = 0;
 	ecs->queries = qm_create();
 	if (ecs_init_comps(comps, nb, ecs) && ecs->queries)
@@ -51,7 +51,7 @@ t_universe	*ecs_create(size_t comps[64], size_t nb)
 	return (NULL);
 }
 
-void	ecs_destroy(t_universe *ecs)
+void	ecs_destroy(t_ecs *ecs)
 {
 	if (!ecs)
 		return ;

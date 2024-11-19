@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/13 13:44:22 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 17:01:49 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,27 +28,27 @@ bool	qm_is_inquery(uint64_t key, uint64_t mask)
 	return (key && (key & mask) == key);
 }
 
-t_query_map	*qm_create(void)
+t_ecs_qmap	*qm_create(void)
 {
-	t_query_map	*qm;
+	t_ecs_qmap	*qm;
 	size_t		capacity;
 
 	capacity = next_pow2(QM_INIT_SIZE);
 	if (__builtin_expect(capacity == 0, 0))
 		return (NULL);
-	qm = malloc(sizeof(t_query_map));
-	if (__builtin_expect(qm == NULL , 0))
+	qm = malloc(sizeof(t_ecs_qmap));
+	if (__builtin_expect(qm == NULL, 0))
 		return (NULL);
-	ft_memset(qm->entries, 0, sizeof(t_map_entry) * capacity);
+	ft_memset(qm->entries, 0, sizeof(t_ecs_qentry) * capacity);
 	qm->capacity = capacity;
 	return (qm);
 }
 
-void	qm_destroy(t_query_map *map)
+void	qm_destroy(t_ecs_qmap *map)
 {
 	size_t	i;
 
-	if (__builtin_expect(map == NULL , 0))
+	if (__builtin_expect(map == NULL, 0))
 		return ;
 	i = -1;
 	while (++i < map->capacity)
@@ -56,7 +56,7 @@ void	qm_destroy(t_query_map *map)
 	free(map);
 }
 
-t_map_entry	*qm_get(t_query_map *map, uint64_t key, bool *res)
+t_ecs_qentry	*qm_get(t_ecs_qmap *map, uint64_t key, bool *res)
 {
 	size_t	index;
 	size_t	start;
