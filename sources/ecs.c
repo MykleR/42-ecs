@@ -6,21 +6,21 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/19 17:02:09 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 21:23:14 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs.h"
 
-static bool	ecs_init_comps(uint16_t comps[64], uint8_t nb, t_ecs *ecs)
+static bool	ecs_init_comps(uint16_t comps[63], uint8_t nb, t_ecs *ecs)
 {
 	uint8_t	i;
 
 	ecs->mem_tsize = 0;
 	ecs->nb_comps = nb;
 	ecs->data = NULL;
-	ft_memset(ecs->mem_offsets, 0, sizeof(uint16_t) * 64);
-	ft_memset(ecs->mem_sizes, 0, sizeof(uint16_t) * 64);
+	ft_memset(ecs->mem_offsets, 0, sizeof(uint16_t) * 63);
+	ft_memset(ecs->mem_sizes, 0, sizeof(uint16_t) * 63);
 	i = -1;
 	while (++i < nb)
 	{
@@ -34,7 +34,7 @@ static bool	ecs_init_comps(uint16_t comps[64], uint8_t nb, t_ecs *ecs)
 	return (ecs->data != NULL);
 }
 
-t_ecs	*ecs_create(uint16_t comps[64], uint8_t nb)
+t_ecs	*ecs_create(uint16_t comps[63], uint8_t nb)
 {
 	t_ecs	*ecs;
 
