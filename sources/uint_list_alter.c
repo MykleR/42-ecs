@@ -6,44 +6,36 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 17:06:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/19 17:00:53 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 20:17:46 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "uint_list.h"
 
-static void	list_delone(t_ecs_ulist **lst)
-{
-	t_ecs_ulist	*node;
-
-	if (__builtin_expect(!lst || !(*lst), 0))
-		return ;
-	node = *lst;
-	if (node->next)
-		node->next->prev = node->prev;
-	if (node->prev)
-		node->prev->next = node->next;
-	*lst = NULL;
-	free(node);
-}
-
 static void	list_fuse_toleft(t_ecs_ulist *lst)
 {
 	t_ecs_ulist	*tmp;
 
-	if (__builtin_expect(!lst->next, 0))
-		return ;
 	lst->end = lst->next->end;
 	tmp = lst->next;
 	list_delone(&tmp);
+}
+
+static void	list_pophead(t_ecs_ulist **lst)
+{
+	t_ecs_ulist	*tmp;
+
+	tmp = (*lst)->next;
+	free(*lst);
+	*lst = tmp;
 }
 
 static void	list_split_toright(t_ecs_ulist *lst, uint32_t val)
 {
 	t_ecs_ulist	*next;
 
-	next = list_create(val + 1, lst, lst->next);
-	next->end = lst->end;
+	next = list_create(val + 1, lst->end, lst->next);
+	lst->next = next;
 	lst->end = val - 1;
 }
 
@@ -51,11 +43,10 @@ void	list_insert(t_ecs_ulist **lst, uint32_t val)
 {
 	t_ecs_ulist	*node;
 
-	if (__builtin_expect(lst == NULL, 0))
-		return ;
-	if (*lst == NULL || ((*lst)->start && val < (*lst)->start - 1))
+	if (!lst || *lst == NULL || ((*lst)->start && val < (*lst)->start - 1))
 	{
-		*lst = list_create(val, NULL, *lst);
+		if (__builtin_expect(lst != NULL, 1))
+			*lst = list_create(val, val, *lst);
 		return ;
 	}
 	node = *lst;
@@ -69,33 +60,33 @@ void	list_insert(t_ecs_ulist **lst, uint32_t val)
 				list_fuse_toleft(node);
 			return ;
 		}
-		if (!node->next)
-			node->next = list_create(val, node, NULL);
+		if (!node->next || (val < node->next->start - 1))
+			node->next = list_create(val, val, node->next);
 		node = node->next;
 	}
 }
 
 void	list_remove(t_ecs_ulist **lst, uint32_t val)
 {
+	t_ecs_ulist	*tmp;
 	t_ecs_ulist	*node;
 
 	if (__builtin_expect(lst == NULL, 0))
 		return ;
+	if (val == (*lst)->start && val == (*lst)->end)
+		return (list_pophead(lst));
 	node = *lst;
 	while (node)
 	{
-		if (val == node->start && val == node->end)
+		if (node->next && val == node->next->start && val == node->next->end)
 		{
-			if (node == *lst)
-				*lst = node->next;
-			list_delone(&node);
+			tmp = node->next->next;
+			list_delone(&(node->next));
+			node->next = tmp;
 			return ;
 		}
 		if (val > node->start && val < node->end)
-		{
-			list_split_toright(node, val);
-			return ;
-		}
+			return (list_split_toright(node, val));
 		node->start += (val == node->start);
 		node->end -= (val == node->end);
 		if (node->start == val + 1 || node->end == val - 1)
