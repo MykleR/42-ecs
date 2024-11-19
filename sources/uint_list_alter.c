@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 17:06:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/19 20:17:46 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 20:34:25 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,11 @@ static void	list_fuse_toleft(t_ecs_ulist *lst)
 	t_ecs_ulist	*tmp;
 
 	lst->end = lst->next->end;
-	tmp = lst->next;
-	list_delone(&tmp);
+	tmp = NULL;
+	if (lst->next)
+		tmp = lst->next->next;
+	list_delone(&(lst->next));
+	lst->next = tmp;
 }
 
 static void	list_pophead(t_ecs_ulist **lst)
