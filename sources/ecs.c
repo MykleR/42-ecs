@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/19 21:23:14 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 22:36:09 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ t_ecs	*ecs_create(uint16_t comps[63], uint8_t nb)
 	t_ecs	*ecs;
 
 	ecs = malloc(sizeof(t_ecs));
-	if (__builtin_expect(!ecs, 0))
+	if (__builtin_expect(!ecs || nb > 63, 0))
 		return (NULL);
 	ft_memset(ecs->masks, 0, ECS_ENTITY_CAP * sizeof(uint64_t));
 	ecs->free_list = NULL;

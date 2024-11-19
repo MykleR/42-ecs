@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/19 22:25:39 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/19 23:55:46 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ t_ecs_ulist	*ecs_query(t_ecs *ecs, uint64_t signature)
 	bool			is_new_query;
 	uint32_t		i;
 
-	if (__builtin_expect(!ecs, 0))
-		abort();
+	assert(ecs && signature);
 	entry = qm_get(ecs->queries, signature, &is_new_query);
 	if (!is_new_query)
 		return (entry->query);
@@ -36,11 +35,12 @@ uint32_t	ecs_entity_clone(t_ecs *ecs, uint32_t id)
 	uint32_t		new_id;
 	uint16_t		i;
 
-	if (__builtin_expect(!ecs || !ecs_entity_alive(ecs, id), 0))
-		abort();
+	assert(ecs && id < ECS_ENTITY_CAP);
+	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+		return (0);
+	i = -1;
 	new_id = ecs_entity_create(ecs);
 	*(ecs->masks + new_id) = *(ecs->masks + id);
-	i = -1;
 	while (++i < ecs->queries->capacity)
 	{
 		entry = ecs->queries->entries + i;
@@ -58,8 +58,9 @@ void	ecs_entity_add(t_ecs *ecs, uint32_t id, uint8_t comp, void *data)
 	uint64_t		new_mask;
 	uint16_t		i;
 
-	if (__builtin_expect(!ecs || comp > ecs->nb_comps || !ecs_entity_alive(ecs, id), 0))
-		abort();
+	assert(ecs && id < ECS_ENTITY_CAP && comp < ecs->nb_comps);
+	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+		return ;
 	i = -1;
 	new_mask = *(ecs->masks + id) | (1ULL << comp);
 	while (++i < ecs->queries->capacity)
@@ -81,10 +82,11 @@ void	ecs_entity_remove(t_ecs *ecs, uint32_t id, uint8_t comp)
 	t_ecs_qentry	*entry;
 	uint16_t		i;
 
-	if (__builtin_expect(!ecs || comp > ecs->nb_comps || !ecs_entity_alive(ecs, id), 0))
-		abort();
+	assert(ecs && id < ECS_ENTITY_CAP && comp < ecs->nb_comps);
+	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+		return ;
 	i = -1;
-	ecs->masks[id] &= ~(1ULL << comp);
+	*(ecs->masks + id) &= ~(1ULL << comp);
 	while (++i < ecs->queries->capacity)
 	{
 		entry = ecs->queries->entries + i;
@@ -98,9 +100,9 @@ void	ecs_entity_kill(t_ecs *ecs, uint32_t id)
 	t_ecs_qentry	*entry;
 	uint16_t		i;
 
-
-	if (__builtin_expect(!ecs, 0))
-		abort();
+	assert(ecs && id < ECS_ENTITY_CAP);
+	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+		return ;
 	i = -1;
 	while (++i < ecs->queries->capacity)
 	{
