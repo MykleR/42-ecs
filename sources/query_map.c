@@ -6,34 +6,23 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/19 22:25:57 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/22 00:23:47 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs.h"
 
-static size_t	next_pow2(size_t n)
-{
-	n--;
-	n |= n >> 1;
-	n |= n >> 2;
-	n |= n >> 4;
-	n |= n >> 8;
-	n |= n >> 16;
-	return (++n);
-}
-
-bool	qm_is_inquery(uint64_t key, uint64_t mask)
-{
-	return (key && (key & mask) == key);
-}
-
 t_ecs_qmap	*qm_create(void)
 {
 	t_ecs_qmap	*qm;
-	size_t		capacity;
+	uint16_t	capacity;
 
-	capacity = next_pow2(QM_INIT_SIZE);
+	capacity = ECS_MAP_INIT_SIZE - 1;
+	capacity |= capacity >> 1;
+	capacity |= capacity >> 2;
+	capacity |= capacity >> 4;
+	capacity |= capacity >> 8;
+	capacity++;
 	if (__builtin_expect(capacity == 0, 0))
 		return (NULL);
 	qm = malloc(sizeof(t_ecs_qmap));
@@ -41,6 +30,7 @@ t_ecs_qmap	*qm_create(void)
 		return (NULL);
 	ft_memset(qm->entries, 0, sizeof(t_ecs_qentry) * capacity);
 	qm->capacity = capacity;
+	qm->length = 0;
 	return (qm);
 }
 
@@ -52,31 +42,55 @@ void	qm_destroy(t_ecs_qmap *map)
 		return ;
 	i = -1;
 	while (++i < map->capacity)
-		list_clear(&(map->entries[i].query));
+		list_destroy(map->entries[i].query);
 	free(map);
 }
 
-t_ecs_qentry	*qm_get(t_ecs_qmap *map, uint64_t key, bool *res)
+t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
 {
 	size_t	index;
-	size_t	start;
 
-	if (__builtin_expect(res != NULL, 1))
-		*res = false;
-	if (__builtin_expect(!map || !key, 0))
+	if (__builtin_expect(!map || !key || map->length >= map->capacity, 0))
 		return (NULL);
 	index = key & (map->capacity - 1);
-	start = index;
 	while (map->entries[index].key != 0)
 	{
 		if (key == map->entries[index].key)
-			return (map->entries + index);
+			return ((map->entries + index)->query);
 		index = (index + 1) & (map->capacity - 1);
-		if (index == start)
-			return (NULL);
 	}
-	if (__builtin_expect(res != NULL, 1))
-		*res = true;
-	map->entries[index].key = key;
-	return (map->entries + index);
+	map->length++;
+	(map->entries + index)->key = key;
+	(map->entries + index)->query = NULL;
+	return (NULL);
+}
+
+void	qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask)
+{
+	uint32_t	i;
+	uint64_t	key;
+
+	i = 0;
+	while (i < map->capacity)
+	{
+		key = (map->entries + i)->key;
+		if ((key & mask) == key)
+			list_remove((map->entries + i)->query, val);
+		i++;
+	}
+}
+
+void	qm_insert(t_ecs_qmap *map, uint32_t val, uint64_t mask, uint64_t prev_mask)
+{
+	uint32_t	i;
+	uint64_t	key;
+
+	i = 0;
+	while (i < map->capacity)
+	{
+		key = (map->entries + i)->key;
+		if ((key & mask) == key && !((key & prev_mask) == key))
+			list_add((map->entries + i)->query, val);
+		i++;
+	}
 }

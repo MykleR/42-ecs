@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:05 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/19 23:47:18 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/22 00:35:53 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ uint32_t	ecs_entity_create(t_ecs *ecs)
 		ecs->free_list = ecs->free_list->next;
 	}
 	*(ecs->masks + id) = ECS_USED_MASK;
-	if (__builtin_expect(ecs->entity_len < ECS_ENTITY_CAP, 1))
-		ecs->entity_len++;
+	ecs->entity_len += (ecs->entity_len < ECS_ENTITY_CAP);
 	return (id);
 }
 
