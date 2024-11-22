@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 11:14:14 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/22 14:12:11 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <assert.h>
 # include <stdbool.h>
 # include <stdint.h>
+# include <stdarg.h>
 
 # define ECS_ENTITY_CAP 1024
 # define ECS_MAP_INIT_SIZE 16
@@ -58,7 +59,7 @@ typedef struct s_ecs
 	uint8_t			nb_comps;
 }					t_ecs;
 
-t_ecs			*ecs_create(uint16_t comps[63], uint8_t nb_comps);
+t_ecs			*ecs_create(uint32_t nb_comps, ...);
 void			ecs_destroy(t_ecs *ecs);
 t_ecs_ulist		*ecs_query(t_ecs *ecs, uint64_t signature);
 

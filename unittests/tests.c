@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 23:16:35 by mykle             #+#    #+#             */
-/*   Updated: 2024/11/22 00:39:19 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/22 14:17:01 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,12 @@ typedef struct s_vector
 #define X 10000
 #define Y 10000
 
-const uint16_t	COMPS[63] = {
-	sizeof(t_vector),
-	sizeof(t_vector)
-};
-
 static t_ecs	*ecs;
 
 static uint32_t	id;
 
 UTEST(ecs, create) {
-	ecs = ecs_create((uint16_t *)COMPS, NB_COMPS);
+	ecs = ecs_create(NB_COMPS, sizeof(t_vector), sizeof(t_vector));
 	ASSERT_NE(ecs, NULL);
 	EXPECT_TRUE(ecs->masks != NULL);
 	EXPECT_EQ(ecs->nb_comps, NB_COMPS);
