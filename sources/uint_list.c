@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/21 23:16:05 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/22 10:36:21 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	list_remove(t_ecs_ulist *lst, uint32_t id)
 	i = 0;
 	while (i < lst->len && lst->values[i] != id)
 		i++;
-	if (i == lst->len)
-		return ;
-	lst->values[i] = lst->values[--lst->len];
+	if (i < lst->len)
+		lst->values[i] = lst->values[--lst->len];
 }

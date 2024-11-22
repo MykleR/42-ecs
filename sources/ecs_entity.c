@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:05 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 00:35:53 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/22 11:16:46 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ bool	ecs_entity_alive(t_ecs *ecs, uint32_t id)
 
 bool	ecs_entity_has(t_ecs *ecs, uint32_t id, uint8_t comp)
 {
-
 	assert(ecs && id < ECS_ENTITY_CAP && comp < ecs->nb_comps);
 	return (ecs_entity_alive(ecs, id)
 		&& ((*(ecs->masks + id) & (1ULL << comp))));

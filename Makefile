@@ -6,7 +6,7 @@
 #    By: mrouves <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/08 18:27:35 by mrouves           #+#    #+#              #
-#    Updated: 2024/11/19 19:57:55 by mrouves          ###   ########.fr        #
+#    Updated: 2024/11/22 11:13:15 by mrouves          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ NAME 			:= lib-ecs.a
 DIR_HEADERS		:= headers
 DIR_SOURCES		:= sources
 DIR_OBJS		:= .objs
+DIR_TESTS		:= unittests
 
 include $(DIR_SOURCES)/sources.mk
 
@@ -46,6 +47,11 @@ clean:
 fclean: clean
 	@rm -f $(NAME)
 	@printf "$(RED)$(NAME) removed$(END)\n"
+
+test: $(NAME)
+	@$(CC) $(CFLAGS) $(IFLAGS) -I $(DIR_TESTS) $(DIR_TESTS)/tests.c $(NAME)
+	@./a.out
+	@rm a.out
 
 re: fclean all
 

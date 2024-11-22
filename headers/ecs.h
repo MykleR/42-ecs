@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 00:21:41 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/22 11:14:14 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,8 @@ bool			ecs_entity_has(t_ecs *ecs, uint32_t id, uint8_t comp);
 t_ecs_qmap		*qm_create(void);
 void			qm_destroy(t_ecs_qmap *map);
 void			qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask);
-void			qm_insert(t_ecs_qmap *map, uint32_t val, uint64_t mask, uint64_t prev_mask);
-t_ecs_ulist		*qm_get(t_ecs_qmap *map, uint64_t key);
+void			qm_insert(t_ecs_qmap *map, uint32_t val, uint64_t mask,
+					uint64_t prev_mask);
+t_ecs_ulist		**qm_get(t_ecs_qmap *map, uint64_t key);
 
 #endif

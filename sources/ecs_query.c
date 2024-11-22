@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 00:34:42 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/22 11:17:46 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,21 @@
 
 t_ecs_ulist	*ecs_query(t_ecs *ecs, uint64_t signature)
 {
-	t_ecs_ulist	*query;
-	uint32_t		i;
+	t_ecs_ulist	**query;
+	uint32_t	i;
 
 	assert(ecs && signature);
 	query = qm_get(ecs->queries, signature);
-	if (query)
-		return (query);
+	if (query && *query)
+		return (*query);
 	if (ecs->queries->length >= ecs->queries->capacity)
 		return (NULL);
-	query = list_create(ECS_QUERY_INIT_SIZE);
+	*query = list_create(ECS_QUERY_INIT_SIZE);
 	i = -1;
 	while (++i < ECS_ENTITY_CAP)
 		if ((signature & *(ecs->masks + i)) == signature)
-			list_add(query, i);
-	return (query);
+			list_add(*query, i);
+	return (*query);
 }
 
 uint32_t	ecs_entity_clone(t_ecs *ecs, uint32_t id)
@@ -40,7 +40,7 @@ uint32_t	ecs_entity_clone(t_ecs *ecs, uint32_t id)
 		return (0);
 	clone = ecs_entity_create(ecs);
 	*(ecs->masks + clone) = *(ecs->masks + id);
-	qm_insert(ecs->queries, id, *(ecs->masks + id), 0);
+	qm_insert(ecs->queries, clone, *(ecs->masks + id), 0);
 	ft_memcpy(ecs_entity_get(ecs, clone, 0),
 		ecs_entity_get(ecs, id, 0), ecs->mem_tsize);
 	return (clone);

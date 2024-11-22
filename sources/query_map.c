@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 00:23:47 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/22 11:17:12 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	qm_destroy(t_ecs_qmap *map)
 	free(map);
 }
 
-t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
+t_ecs_ulist	**qm_get(t_ecs_qmap *map, uint64_t key)
 {
 	size_t	index;
 
@@ -56,13 +56,12 @@ t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
 	while (map->entries[index].key != 0)
 	{
 		if (key == map->entries[index].key)
-			return ((map->entries + index)->query);
+			return (&(map->entries + index)->query);
 		index = (index + 1) & (map->capacity - 1);
 	}
 	map->length++;
 	(map->entries + index)->key = key;
-	(map->entries + index)->query = NULL;
-	return (NULL);
+	return (&(map->entries + index)->query);
 }
 
 void	qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask)
@@ -80,7 +79,8 @@ void	qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask)
 	}
 }
 
-void	qm_insert(t_ecs_qmap *map, uint32_t val, uint64_t mask, uint64_t prev_mask)
+void	qm_insert(t_ecs_qmap *map, uint32_t val,
+			uint64_t mask, uint64_t prev_mask)
 {
 	uint32_t	i;
 	uint64_t	key;

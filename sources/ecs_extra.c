@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:08:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/20 00:16:46 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/22 11:17:30 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	ecs_queue_add(t_ecs_queue **queue, t_ecs_alteration type,
 		t_ecs_queue_payload p)
 {
-	t_ecs_queue *node;
+	t_ecs_queue	*node;
 
 	assert(queue);
 	node = malloc(sizeof(t_ecs_queue));
