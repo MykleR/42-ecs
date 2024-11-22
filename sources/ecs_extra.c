@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:08:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 11:17:30 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/22 11:26:04 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,19 @@ void	ecs_queue_add(t_ecs_queue **queue, t_ecs_alteration type,
 	node->payload = p;
 	node->next = *queue;
 	*queue = node;
+}
+
+void	ecs_queue_destroy(t_ecs_queue **queue)
+{
+	t_ecs_queue	*tmp;
+	if (!queue)
+		return ;
+	while (*queue)
+	{
+		tmp = (*queue)->next;
+		free(tmp);
+		*queue = tmp;
+	}
 }
 
 void	ecs_queue_process(t_ecs *ecs, t_ecs_queue **queue)
