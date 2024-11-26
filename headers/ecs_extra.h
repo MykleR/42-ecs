@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:00:52 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/26 15:36:54 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/26 15:45:51 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,6 @@ typedef struct s_ecs_queue
 	uint32_t			cap;
 	t_ecs_queue_entry	*pending;
 }	t_ecs_queue;
-
-//typedef struct s_ecs_queue
-//{
-//	struct s_ecs_queue	*next;
-//	t_ecs_queue_payload	payload;
-//	t_ecs_alteration	type;
-//}	t_ecs_queue;
 
 void	ecs_queue_create(t_ecs_queue *queue, uint32_t cap);
 void	ecs_queue_destroy(t_ecs_queue *queue);
