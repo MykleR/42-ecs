@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:08:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/26 15:36:27 by mykle            ###   ########.fr       */
+/*   Updated: 2024/11/26 16:06:06 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	ecs_queue_add(t_ecs_queue *queue, t_ecs_queue_entry info)
 	queue->len++;
 }
 
-void	ecs_qeue_process(t_ecs *ecs, t_ecs_queue *queue)
+void	ecs_queue_process(t_ecs *ecs, t_ecs_queue *queue)
 {
 	t_ecs_queue_entry	entry;
 
@@ -63,4 +63,5 @@ void	ecs_qeue_process(t_ecs *ecs, t_ecs_queue *queue)
 		else if (entry.type == REMOVE)
 			ecs_entity_remove(ecs, entry.id, entry.comp);
 	}
+	queue->len = 0;
 }
