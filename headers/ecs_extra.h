@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:00:52 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 11:24:27 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/11/26 15:36:54 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,30 @@ typedef enum e_ecs_alteration
 	REMOVE,
 }	t_ecs_alteration;
 
-typedef struct s_ecs_queue_payload
+typedef struct s_ecs_queue_entry
 {
-	void		*data;
-	uint32_t	id;
-	uint8_t		comp;		
-}				t_ecs_queue_payload;
+	void				*data;
+	uint32_t			id;
+	uint8_t				comp;
+	t_ecs_alteration	type;
+}				t_ecs_queue_entry;
 
 typedef struct s_ecs_queue
 {
-	struct s_ecs_queue	*next;
-	t_ecs_queue_payload	payload;
-	t_ecs_alteration	type;
+	uint32_t			len;
+	uint32_t			cap;
+	t_ecs_queue_entry	*pending;
 }	t_ecs_queue;
 
-void	ecs_queue_process(t_ecs *ecs, t_ecs_queue **queue);
-void	ecs_queue_add(t_ecs_queue **queue, t_ecs_alteration type,
-			t_ecs_queue_payload p);
-void	ecs_queue_destroy(t_ecs_queue **queue);
+//typedef struct s_ecs_queue
+//{
+//	struct s_ecs_queue	*next;
+//	t_ecs_queue_payload	payload;
+//	t_ecs_alteration	type;
+//}	t_ecs_queue;
 
+void	ecs_queue_create(t_ecs_queue *queue, uint32_t cap);
+void	ecs_queue_destroy(t_ecs_queue *queue);
+void	ecs_qeue_process(t_ecs *ecs, t_ecs_queue *queue);
+void	ecs_queue_add(t_ecs_queue *queue, t_ecs_queue_entry info);
 #endif
