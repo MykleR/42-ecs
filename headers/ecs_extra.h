@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:00:52 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/26 16:06:12 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:00:23 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define ECS_EXTRA_H
 
 # include "ecs.h"
+
+# define ECS_QUEUE_INIT_CAP 32
 
 typedef enum e_ecs_alteration
 {
@@ -38,7 +40,7 @@ typedef struct s_ecs_queue
 	t_ecs_queue_entry	*pending;
 }	t_ecs_queue;
 
-void	ecs_queue_create(t_ecs_queue *queue, uint32_t cap);
+bool	ecs_queue_create(t_ecs_queue *queue);
 void	ecs_queue_destroy(t_ecs_queue *queue);
 void	ecs_queue_process(t_ecs *ecs, t_ecs_queue *queue);
 void	ecs_queue_add(t_ecs_queue *queue, t_ecs_queue_entry info);

@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 14:12:11 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/02 20:00:05 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,13 @@
 # include <stdarg.h>
 
 # define ECS_ENTITY_CAP 1024
-# define ECS_MAP_INIT_SIZE 16
-# define ECS_QUERY_INIT_SIZE 1024
+# define ECS_MAP_INIT_SIZE 8
 
 # define ECS_USED_MASK 0x8000000000000000
 
 typedef struct s_ecs_qentry
 {
-	t_ecs_ulist		*query;
+	t_ecs_ulist		query;
 	uint64_t		key;
 }					t_ecs_qentry;
 
@@ -78,6 +77,6 @@ void			qm_destroy(t_ecs_qmap *map);
 void			qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask);
 void			qm_insert(t_ecs_qmap *map, uint32_t val, uint64_t mask,
 					uint64_t prev_mask);
-t_ecs_ulist		**qm_get(t_ecs_qmap *map, uint64_t key);
+t_ecs_ulist		*qm_get(t_ecs_qmap *map, uint64_t key);
 
 #endif

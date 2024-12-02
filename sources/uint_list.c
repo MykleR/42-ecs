@@ -6,27 +6,21 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 10:36:21 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/02 20:04:21 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "uint_list.h"
 #include "utils.h"
 
-t_ecs_ulist	*list_create(uint32_t cap)
+bool	list_create(t_ecs_ulist *lst)
 {
-	t_ecs_ulist	*lst;
-
-	lst = malloc(sizeof(t_ecs_ulist));
 	if (__builtin_expect(!lst, 0))
-		return (NULL);
-	lst->cap = cap;
+		return (false);
 	lst->len = 0;
-	lst->values = ft_calloc(sizeof(uint32_t), cap);
-	if (lst->values)
-		return (lst);
-	free(lst);
-	return (NULL);
+	lst->cap = ECS_ULIST_INIT_CAP;
+	lst->values = ft_calloc(sizeof(uint32_t), lst->cap);
+	return (lst->values != NULL);
 }
 
 void	list_destroy(t_ecs_ulist *lst)
@@ -34,7 +28,9 @@ void	list_destroy(t_ecs_ulist *lst)
 	if (__builtin_expect(!lst, 0))
 		return ;
 	free(lst->values);
-	free(lst);
+	lst->values = NULL;
+	lst->len = 0;
+	lst->cap = 0;
 }
 
 uint32_t	list_popfront(t_ecs_ulist *lst)

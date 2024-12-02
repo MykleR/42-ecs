@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 11:17:12 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/02 20:07:17 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,10 @@ t_ecs_qmap	*qm_create(void)
 	capacity++;
 	if (__builtin_expect(capacity == 0, 0))
 		return (NULL);
-	qm = malloc(sizeof(t_ecs_qmap));
+	qm = ft_calloc(sizeof(t_ecs_qmap), 1);
 	if (__builtin_expect(qm == NULL, 0))
 		return (NULL);
-	ft_memset(qm->entries, 0, sizeof(t_ecs_qentry) * capacity);
 	qm->capacity = capacity;
-	qm->length = 0;
 	return (qm);
 }
 
@@ -38,15 +36,17 @@ void	qm_destroy(t_ecs_qmap *map)
 {
 	size_t	i;
 
-	if (__builtin_expect(map == NULL, 0))
+	if (__builtin_expect(!map, 0))
 		return ;
 	i = -1;
 	while (++i < map->capacity)
-		list_destroy(map->entries[i].query);
+		list_destroy(&map->entries[i].query);
+	map->length = 0;
+	map->capacity = 0;
 	free(map);
 }
 
-t_ecs_ulist	**qm_get(t_ecs_qmap *map, uint64_t key)
+t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
 {
 	size_t	index;
 
@@ -61,6 +61,7 @@ t_ecs_ulist	**qm_get(t_ecs_qmap *map, uint64_t key)
 	}
 	map->length++;
 	(map->entries + index)->key = key;
+	list_create(&(map->entries + index)->query);
 	return (&(map->entries + index)->query);
 }
 
@@ -74,7 +75,7 @@ void	qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask)
 	{
 		key = (map->entries + i)->key;
 		if ((key & mask) == key)
-			list_remove((map->entries + i)->query, val);
+			list_remove(&(map->entries + i)->query, val);
 		i++;
 	}
 }
@@ -90,7 +91,7 @@ void	qm_insert(t_ecs_qmap *map, uint32_t val,
 	{
 		key = (map->entries + i)->key;
 		if ((key & mask) == key && !((key & prev_mask) == key))
-			list_add((map->entries + i)->query, val);
+			list_add(&(map->entries + i)->query, val);
 		i++;
 	}
 }

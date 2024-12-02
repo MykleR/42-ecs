@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/22 14:18:18 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/02 19:53:10 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,9 @@ t_ecs	*ecs_create(uint32_t nb, ...)
 	t_ecs	*ecs;
 	va_list	args;
 
-	ecs = malloc(sizeof(t_ecs));
+	ecs = ft_calloc(sizeof(t_ecs), 1);
 	if (__builtin_expect(!ecs || nb > 63, 0))
 		return (NULL);
-	ft_memset(ecs->masks, 0, ECS_ENTITY_CAP * sizeof(uint64_t));
-	ecs->free_list = NULL;
-	ecs->entity_len = 0;
 	ecs->queries = qm_create();
 	va_start(args, nb);
 	if (!ecs->queries || !ecs_init_comps(ecs, nb, args))
@@ -64,5 +61,9 @@ void	ecs_destroy(t_ecs *ecs)
 		return ;
 	qm_destroy(ecs->queries);
 	free(ecs->data);
+	ecs->data = NULL;
+	ecs->queries = NULL;
+	ecs->free_list = NULL;
+	ecs->entity_len = 0;
 	free(ecs);
 }

@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 23:16:35 by mykle             #+#    #+#             */
-/*   Updated: 2024/11/22 14:17:01 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/02 20:03:17 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ UTEST(ecs, query_empty)
 	t_ecs_ulist	*query = ecs_query(ecs, (1ULL << POS));
 	ASSERT_NE(query, NULL);
 	EXPECT_EQ(query->len, 0L);
-	EXPECT_EQ(query->cap, (uint32_t)ECS_QUERY_INIT_SIZE);
+	EXPECT_EQ(query->cap, (uint32_t)ECS_ULIST_INIT_CAP);
 }
 
 UTEST(ecs, entity_create)

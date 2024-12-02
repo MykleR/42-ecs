@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:03:10 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/21 23:19:03 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:02:12 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 # include <stdlib.h>
 # include <stdint.h>
+# include <stdbool.h>
+
+# define ECS_ULIST_INIT_CAP 32
 
 typedef struct s_ecs_ulist
 {
@@ -23,9 +26,9 @@ typedef struct s_ecs_ulist
 	uint32_t	len;
 }					t_ecs_ulist;
 
-t_ecs_ulist		*list_create(uint32_t cap);
+bool			list_create(t_ecs_ulist *lst);
+void			list_destroy(t_ecs_ulist *lst);
+uint32_t		list_popfront(t_ecs_ulist *lst);
 void			list_add(t_ecs_ulist *lst, uint32_t id);
 void			list_remove(t_ecs_ulist *lst, uint32_t id);
-uint32_t		list_popfront(t_ecs_ulist *lst);
-void			list_destroy(t_ecs_ulist *lst);
 #endif

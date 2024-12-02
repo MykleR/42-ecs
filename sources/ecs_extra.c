@@ -6,19 +6,20 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:08:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/11/26 16:06:06 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:00:56 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs_extra.h"
 
-void	ecs_queue_create(t_ecs_queue *queue, uint32_t cap)
+bool	ecs_queue_create(t_ecs_queue *queue)
 {
-	if (!queue || !cap)
-		return ;
-	queue->cap = cap;
+	if (__builtin_expect(!queue, 0))
+		return (false);
+	queue->cap = ECS_QUEUE_INIT_CAP;
 	queue->len = 0;
-	queue->pending = malloc(sizeof(t_ecs_queue_entry) * cap);
+	queue->pending = ft_calloc(sizeof(t_ecs_queue_entry), queue->cap);
+	return (queue->pending != NULL);
 }
 
 void	ecs_queue_destroy(t_ecs_queue *queue)
@@ -27,6 +28,8 @@ void	ecs_queue_destroy(t_ecs_queue *queue)
 		return ;
 	free(queue->pending);
 	queue->pending = NULL;
+	queue->len = 0;
+	queue->cap = 0;
 }
 
 void	ecs_queue_add(t_ecs_queue *queue, t_ecs_queue_entry info)
