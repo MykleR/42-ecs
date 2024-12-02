@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:05 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 21:26:51 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/03 00:12:13 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ bool	ecs_entity_alive(t_ecs *ecs, uint32_t id)
 
 bool	ecs_entity_has(t_ecs *ecs, uint32_t id, uint8_t comp)
 {
-	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP || comp >= ecs->nb_comps, 0))
+	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP
+			|| comp >= ecs->nb_comps, 0))
 		return (false);
 	return (ecs_entity_alive(ecs, id)
 		&& ((*(ecs->masks + id) & (1ULL << comp))));
@@ -51,7 +52,8 @@ void	*ecs_entity_get(t_ecs *ecs, uint32_t id, uint8_t comp)
 	size_t	offset;
 	size_t	size;
 
-	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP || comp >= ecs->nb_comps, 0))
+	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP
+			|| comp >= ecs->nb_comps, 0))
 		return (NULL);
 	offset = *(ecs->mem_offsets + comp);
 	size = ecs->mem_tsize;

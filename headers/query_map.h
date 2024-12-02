@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 20:15:32 by mykle             #+#    #+#             */
-/*   Updated: 2024/12/02 20:21:03 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/03 00:12:30 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ typedef struct s_ecs_qmap
 	uint16_t		capacity;
 	uint16_t		length;
 }					t_ecs_qmap;
-
 
 bool			qm_create(t_ecs_qmap *map);
 void			qm_destroy(t_ecs_qmap *map);
