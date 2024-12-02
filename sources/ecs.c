@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:24:01 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:37:00 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,10 @@ t_ecs	*ecs_create(uint32_t nb, ...)
 	t_ecs	*ecs;
 	va_list	args;
 
+	if (__builtin_expect(nb >= 64, 0))
+		return (NULL);
 	ecs = ft_calloc(sizeof(t_ecs), 1);
-	if (__builtin_expect(!ecs || nb > 63, 0))
+	if (__builtin_expect(!ecs, 0))
 		return (NULL);
 	va_start(args, nb);
 	if (!qm_create(&ecs->queries) || !ecs_init_comps(ecs, nb, args))

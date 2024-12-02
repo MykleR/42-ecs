@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:30:34 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:42:08 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,10 @@ t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
 			return (&(map->entries + index)->query);
 		index = (index + 1) & (map->capacity - 1);
 	}
+	if (!list_create(&(map->entries + index)->query))
+		return (NULL);
 	map->length++;
 	(map->entries + index)->key = key;
-	list_create(&(map->entries + index)->query);
 	return (&(map->entries + index)->query);
 }
 
@@ -67,6 +68,8 @@ void	qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask)
 	uint32_t	i;
 	uint64_t	key;
 
+	if (__builtin_expect(!map, 0))
+		return ;
 	i = 0;
 	while (i < map->capacity)
 	{
@@ -83,6 +86,8 @@ void	qm_insert(t_ecs_qmap *map, uint32_t val,
 	uint32_t	i;
 	uint64_t	key;
 
+	if (__builtin_expect(!map, 0))
+		return ;
 	i = 0;
 	while (i < map->capacity)
 	{

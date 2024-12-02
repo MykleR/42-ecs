@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:26:54 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 21:22:11 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ t_ecs_ulist	*ecs_query(t_ecs *ecs, uint64_t signature)
 
 	assert(ecs && signature);
 	query = qm_get(&ecs->queries, signature);
-	if (query && query->len)
-		return (query);
-	if (ecs->queries.length >= ecs->queries.capacity)
+	if (!query || ecs->queries.length >= ecs->queries.capacity)
 		return (NULL);
+	if (query->len)
+		return (query);
 	i = -1;
 	while (++i < ECS_ENTITY_CAP)
 		if ((signature & *(ecs->masks + i)) == signature)
