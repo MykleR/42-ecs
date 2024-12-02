@@ -6,22 +6,19 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 19:53:10 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:24:01 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs.h"
+#include "utils.h"
 
 static bool	ecs_init_comps(t_ecs *ecs, uint8_t nb, va_list args)
 {
 	uint8_t		i;
 	uint32_t	mem_size;
 
-	ecs->mem_tsize = 0;
 	ecs->nb_comps = nb;
-	ecs->data = NULL;
-	ft_memset(ecs->mem_offsets, 0, sizeof(uint16_t) * 63);
-	ft_memset(ecs->mem_sizes, 0, sizeof(uint16_t) * 63);
 	i = -1;
 	while (++i < nb)
 	{
@@ -44,9 +41,8 @@ t_ecs	*ecs_create(uint32_t nb, ...)
 	ecs = ft_calloc(sizeof(t_ecs), 1);
 	if (__builtin_expect(!ecs || nb > 63, 0))
 		return (NULL);
-	ecs->queries = qm_create();
 	va_start(args, nb);
-	if (!ecs->queries || !ecs_init_comps(ecs, nb, args))
+	if (!qm_create(&ecs->queries) || !ecs_init_comps(ecs, nb, args))
 	{
 		ecs_destroy(ecs);
 		ecs = NULL;
@@ -59,11 +55,8 @@ void	ecs_destroy(t_ecs *ecs)
 {
 	if (!ecs)
 		return ;
-	qm_destroy(ecs->queries);
+	qm_destroy(&ecs->queries);
 	free(ecs->data);
-	ecs->data = NULL;
-	ecs->queries = NULL;
-	ecs->free_list = NULL;
-	ecs->entity_len = 0;
+	ft_memset(ecs, 0, sizeof(t_ecs));
 	free(ecs);
 }

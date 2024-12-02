@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:04:21 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:30:09 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,7 @@ void	list_destroy(t_ecs_ulist *lst)
 	if (__builtin_expect(!lst, 0))
 		return ;
 	free(lst->values);
-	lst->values = NULL;
-	lst->len = 0;
-	lst->cap = 0;
+	ft_memset(lst, 0, sizeof(t_ecs_ulist));
 }
 
 uint32_t	list_popfront(t_ecs_ulist *lst)

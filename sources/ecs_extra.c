@@ -6,11 +6,12 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:08:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:00:56 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:25:49 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ecs_extra.h"
+#include "utils.h"
 
 bool	ecs_queue_create(t_ecs_queue *queue)
 {
@@ -27,9 +28,7 @@ void	ecs_queue_destroy(t_ecs_queue *queue)
 	if (!queue)
 		return ;
 	free(queue->pending);
-	queue->pending = NULL;
-	queue->len = 0;
-	queue->cap = 0;
+	ft_memset(queue, 0, sizeof(t_ecs_queue));
 }
 
 void	ecs_queue_add(t_ecs_queue *queue, t_ecs_queue_entry info)

@@ -6,14 +6,13 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:03:10 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:02:12 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:18:22 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UINT_LIST_H
 # define UINT_LIST_H
 
-# include <stdlib.h>
 # include <stdint.h>
 # include <stdbool.h>
 

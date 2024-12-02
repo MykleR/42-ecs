@@ -6,30 +6,29 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:07:17 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/02 20:30:34 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ecs.h"
+#include "query_map.h"
+#include "utils.h"
 
-t_ecs_qmap	*qm_create(void)
+bool	qm_create(t_ecs_qmap *map)
 {
-	t_ecs_qmap	*qm;
 	uint16_t	capacity;
 
-	capacity = ECS_MAP_INIT_SIZE - 1;
+	capacity = ECS_QMAP_INIT_SIZE - 1;
 	capacity |= capacity >> 1;
 	capacity |= capacity >> 2;
 	capacity |= capacity >> 4;
 	capacity |= capacity >> 8;
 	capacity++;
 	if (__builtin_expect(capacity == 0, 0))
-		return (NULL);
-	qm = ft_calloc(sizeof(t_ecs_qmap), 1);
-	if (__builtin_expect(qm == NULL, 0))
-		return (NULL);
-	qm->capacity = capacity;
-	return (qm);
+		return (false);
+	map->length = 0;
+	map->capacity = capacity;
+	ft_memset(map->entries, 0, sizeof(t_ecs_qentry) * capacity);
+	return (true);
 }
 
 void	qm_destroy(t_ecs_qmap *map)
@@ -41,9 +40,7 @@ void	qm_destroy(t_ecs_qmap *map)
 	i = -1;
 	while (++i < map->capacity)
 		list_destroy(&map->entries[i].query);
-	map->length = 0;
-	map->capacity = 0;
-	free(map);
+	ft_memset(map, 0, sizeof(t_ecs_qmap));
 }
 
 t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
