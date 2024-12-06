@@ -6,7 +6,7 @@
 #    By: mrouves <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/08 18:27:35 by mrouves           #+#    #+#              #
-#    Updated: 2024/11/22 11:13:15 by mrouves          ###   ########.fr        #
+#    Updated: 2024/12/06 16:28:28 by mrouves          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ CFLAGS			:= -Wall -Wextra -Werror -g
 IFLAGS			:= -I $(DIR_HEADERS)
 
 GREEN			= \033[0;32m
-RED				= \033[0;31m
+BOLD			= \033[1m
 END				= \033[0m
 DIR_DUP			= mkdir -p $(@D)
 
@@ -34,7 +34,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ar -rcs $@ $^
-	@printf "$(GREEN)$(NAME) compiled$(END)\n"
+	@printf "$(BOLD)$(NAME)$(END) compiled $(GREEN)successfully$(END)\n"
 
 $(DIR_OBJS)/%.o: $(DIR_SOURCES)/%.c
 	@$(DIR_DUP)
@@ -42,11 +42,11 @@ $(DIR_OBJS)/%.o: $(DIR_SOURCES)/%.c
 
 clean:
 	@rm -rf $(DIR_OBJS)
-	@printf "$(RED)$(NAME) cleaned objs$(END)\n"
+	@printf "Cleaned $(BOLD)$(DIR_OBJS)$(END)\n"
 
 fclean: clean
 	@rm -f $(NAME)
-	@printf "$(RED)$(NAME) removed$(END)\n"
+	@printf "Cleaned $(BOLD)$(NAME)$(END)\n"
 
 test: $(NAME)
 	@$(CC) $(CFLAGS) $(IFLAGS) -I $(DIR_TESTS) $(DIR_TESTS)/tests.c $(NAME)
