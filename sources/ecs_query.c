@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 21:22:11 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/06 17:27:55 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ t_ecs_ulist	*ecs_query(t_ecs *ecs, uint64_t signature)
 	t_ecs_ulist	*query;
 	uint32_t	i;
 
-	assert(ecs && signature);
+	if (__builtin_expect(!ecs || !signature, 0))
+		return (NULL);
 	query = qm_get(&ecs->queries, signature);
 	if (!query || ecs->queries.length >= ecs->queries.capacity)
 		return (NULL);
@@ -35,8 +36,8 @@ uint32_t	ecs_entity_clone(t_ecs *ecs, uint32_t id)
 {
 	uint32_t		clone;
 
-	assert(ecs && id < ECS_ENTITY_CAP);
-	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP
+			|| !ecs_entity_alive(ecs, id), 0))
 		return (0);
 	clone = ecs_entity_create(ecs);
 	*(ecs->masks + clone) = *(ecs->masks + id);
@@ -50,8 +51,8 @@ void	ecs_entity_add(t_ecs *ecs, uint32_t id, uint8_t comp, void *data)
 {
 	uint64_t		new_mask;
 
-	assert(ecs && id < ECS_ENTITY_CAP && comp < ecs->nb_comps);
-	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP
+			|| comp >= ecs->nb_comps || !ecs_entity_alive(ecs, id), 0))
 		return ;
 	new_mask = *(ecs->masks + id) | (1ULL << comp);
 	qm_insert(&ecs->queries, id, new_mask, *(ecs->masks + id));
@@ -64,8 +65,8 @@ void	ecs_entity_add(t_ecs *ecs, uint32_t id, uint8_t comp, void *data)
 
 void	ecs_entity_remove(t_ecs *ecs, uint32_t id, uint8_t comp)
 {
-	assert(ecs && id < ECS_ENTITY_CAP && comp < ecs->nb_comps);
-	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP
+			|| comp >= ecs->nb_comps || !ecs_entity_alive(ecs, id), 0))
 		return ;
 	qm_remove(&ecs->queries, id, (1ULL < comp));
 	*(ecs->masks + id) &= ~(1ULL << comp);
@@ -73,8 +74,8 @@ void	ecs_entity_remove(t_ecs *ecs, uint32_t id, uint8_t comp)
 
 void	ecs_entity_kill(t_ecs *ecs, uint32_t id)
 {
-	assert(ecs && id < ECS_ENTITY_CAP);
-	if (__builtin_expect(!ecs_entity_alive(ecs, id), 0))
+	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP
+			|| !ecs_entity_alive(ecs, id), 0))
 		return ;
 	qm_remove(&ecs->queries, id, *(ecs->masks + id));
 	*(ecs->masks + id) = 0;

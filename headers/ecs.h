@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/05 19:31:05 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/06 17:28:40 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # include "query_map.h"
 
-# include <assert.h>
 # include <stdbool.h>
 # include <stdint.h>
 # include <stdarg.h>
