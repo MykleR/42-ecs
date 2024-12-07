@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 23:16:35 by mykle             #+#    #+#             */
-/*   Updated: 2024/12/02 20:03:17 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/07 19:39:43 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ UTEST(ecs, entity_create)
 UTEST(ecs, entity_add)
 {
 	ecs_entity_add(ecs, id, POS, &(t_vector){X, Y});
-	ASSERT_EQ(ecs->masks[id], ECS_USED_MASK | (1UL << POS));
+	ASSERT_EQ(ecs->masks[id], (ECS_USED_MASK | (1UL << POS)));
 }
 
 UTEST(ecs, entity_get)

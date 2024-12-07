@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/06 17:28:40 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/07 19:35:03 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,10 @@
 # include <stdarg.h>
 # include <stdlib.h>
 
-# define ECS_ENTITY_CAP 42000
+# ifndef ECS_ENTITY_CAP
+#  define ECS_ENTITY_CAP 42000
+# endif
+
 # define ECS_USED_MASK 0x8000000000000000
 
 typedef struct s_ecs_flist
