@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 19:06:16 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:30:09 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/09 16:36:53 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ uint32_t	list_popfront(t_ecs_ulist *lst)
 {
 	uint32_t	val;
 
-	if (__builtin_expect(!lst || !lst->len, 0))
+	if (__builtin_expect(!lst || !lst->values || !lst->len, 0))
 		return (0);
 	lst->len--;
 	val = *(lst->values);
@@ -45,13 +45,20 @@ uint32_t	list_popfront(t_ecs_ulist *lst)
 
 void	list_add(t_ecs_ulist *lst, uint32_t id)
 {
-	if (__builtin_expect(!lst, 0))
+	uint32_t	new_cap;
+
+	if (__builtin_expect(!lst || !lst->values || lst->len == UINT32_MAX, 0))
 		return ;
 	if (__builtin_expect(lst->len >= lst->cap, 0))
 	{
+		new_cap = lst->cap << 1;
+		if (new_cap >> 1 != lst->cap)
+			new_cap = UINT32_MAX;
 		lst->values = ft_realloc(lst->values, lst->cap * sizeof(uint32_t),
-				lst->cap * sizeof(uint32_t) << 1);
-		lst->cap <<= 1;
+				new_cap * sizeof(uint32_t));
+		if (!lst->values)
+			return ;
+		lst->cap = new_cap;
 	}
 	lst->values[lst->len++] = id;
 }
@@ -60,7 +67,7 @@ void	list_remove(t_ecs_ulist *lst, uint32_t id)
 {
 	uint32_t	i;
 
-	if (__builtin_expect(!lst || !lst->len, 0))
+	if (__builtin_expect(!lst || !lst->values || !lst->len, 0))
 		return ;
 	i = 0;
 	while (i < lst->len && lst->values[i] != id)
