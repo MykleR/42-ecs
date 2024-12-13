@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:05 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/03 00:12:13 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/13 21:16:34 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,14 @@ uint32_t	ecs_entity_create(t_ecs *ecs)
 	return (id);
 }
 
-bool	ecs_entity_alive(t_ecs *ecs, uint32_t id)
+inline bool	ecs_entity_alive(t_ecs *ecs, uint32_t id)
 {
 	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP, 0))
 		return (false);
 	return (*(ecs->masks + id) & ECS_USED_MASK);
 }
 
-bool	ecs_entity_has(t_ecs *ecs, uint32_t id, uint8_t comp)
+inline bool	ecs_entity_has(t_ecs *ecs, uint32_t id, uint8_t comp)
 {
 	if (__builtin_expect(!ecs || id >= ECS_ENTITY_CAP
 			|| comp >= ecs->nb_comps, 0))
@@ -47,7 +47,7 @@ bool	ecs_entity_has(t_ecs *ecs, uint32_t id, uint8_t comp)
 		&& ((*(ecs->masks + id) & (1ULL << comp))));
 }
 
-void	*ecs_entity_get(t_ecs *ecs, uint32_t id, uint8_t comp)
+inline void	*ecs_entity_get(t_ecs *ecs, uint32_t id, uint8_t comp)
 {
 	size_t	offset;
 	size_t	size;
