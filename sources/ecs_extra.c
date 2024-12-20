@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:08:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/09 18:47:21 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/20 16:00:17 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,27 +28,26 @@ void	ecs_queue_destroy(t_ecs_queue *queue)
 	if (!queue)
 		return ;
 	free(queue->pending);
-	ft_memset(queue, 0, sizeof(t_ecs_queue));
+	queue->pending = NULL;
+	queue->len = 0;
+	queue->cap = 0;
 }
 
 void	ecs_queue_add(t_ecs_queue *queue, t_ecs_queue_entry info)
 {
-	uint32_t	new_cap;
-
 	if (__builtin_expect(!queue || !queue->pending
 			|| queue->len == UINT32_MAX, 0))
 		return ;
 	if (__builtin_expect(queue->len >= queue->cap, 0))
 	{
-		new_cap = queue->cap << 1;
-		if (new_cap >> 1 != queue->cap)
-			new_cap = UINT32_MAX;
-		queue->pending = ft_realloc(queue->pending, queue->cap
-				* sizeof(t_ecs_queue_entry),
-				new_cap * sizeof(t_ecs_queue_entry));
+		if ((queue->cap << 1) >> 1 != queue->cap)
+			return ;
+		queue->pending = ft_realloc(queue->pending,
+				queue->cap * sizeof(t_ecs_queue_entry),
+				(queue->cap << 1) * sizeof(t_ecs_queue_entry));
 		if (!queue->pending)
 			return ;
-		queue->cap = new_cap;
+		queue->cap <<= 1;
 	}
 	*(queue->pending + queue->len) = info;
 	queue->len++;
@@ -58,7 +57,9 @@ void	ecs_queue_process(t_ecs *ecs, t_ecs_queue *queue)
 {
 	t_ecs_queue_entry	entry;
 
-	if (__builtin_expect(!ecs || !queue || !queue->len, 0))
+	if (__builtin_expect(!ecs || !queue, 0))
+		return ;
+	if (!queue->len)
 		return ;
 	while (queue->len--)
 	{

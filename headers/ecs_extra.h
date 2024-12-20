@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 15:00:52 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:00:23 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/20 15:59:29 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include "ecs.h"
 
-# define ECS_QUEUE_INIT_CAP 32
+# define ECS_QUEUE_INIT_CAP 64
 
 typedef enum e_ecs_alteration
 {

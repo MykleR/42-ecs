@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:12:49 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:37:00 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/20 16:00:51 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,5 @@ void	ecs_destroy(t_ecs *ecs)
 		return ;
 	qm_destroy(&ecs->queries);
 	free(ecs->data);
-	ft_memset(ecs, 0, sizeof(t_ecs));
 	free(ecs);
 }
