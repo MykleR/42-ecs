@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 22:32:33 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/06 17:27:55 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/20 18:23:39 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,13 @@
 t_ecs_ulist	*ecs_query(t_ecs *ecs, uint64_t signature)
 {
 	t_ecs_ulist	*query;
+	bool		is_new;
 	uint32_t	i;
 
 	if (__builtin_expect(!ecs || !signature, 0))
 		return (NULL);
-	query = qm_get(&ecs->queries, signature);
-	if (!query || ecs->queries.length >= ecs->queries.capacity)
-		return (NULL);
-	if (query->len)
+	query = qm_get(&ecs->queries, signature, &is_new);
+	if (!query || !is_new)
 		return (query);
 	i = -1;
 	while (++i < ECS_ENTITY_CAP)
@@ -82,5 +81,4 @@ void	ecs_entity_kill(t_ecs *ecs, uint32_t id)
 	ecs->entity_len--;
 	((t_ecs_flist *)(ecs->masks + id))->next = ecs->free_list;
 	ecs->free_list = (t_ecs_flist *)(ecs->masks + id);
-	ft_memset(ecs_entity_get(ecs, id, 0), 0, ecs->mem_tsize);
 }

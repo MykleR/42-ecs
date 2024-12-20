@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 20:15:32 by mykle             #+#    #+#             */
-/*   Updated: 2024/12/03 00:12:30 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/20 18:19:44 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,6 @@ void			qm_destroy(t_ecs_qmap *map);
 void			qm_remove(t_ecs_qmap *map, uint32_t val, uint64_t mask);
 void			qm_insert(t_ecs_qmap *map, uint32_t val, uint64_t mask,
 					uint64_t prev_mask);
-t_ecs_ulist		*qm_get(t_ecs_qmap *map, uint64_t key);
+t_ecs_ulist		*qm_get(t_ecs_qmap *map, uint64_t key, bool *new);
 
 #endif

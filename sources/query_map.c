@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/02 20:42:08 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/20 18:21:46 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,14 @@ void	qm_destroy(t_ecs_qmap *map)
 	ft_memset(map, 0, sizeof(t_ecs_qmap));
 }
 
-t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
+t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key, bool *new)
 {
 	size_t	index;
 
 	if (__builtin_expect(!map || !key || map->length >= map->capacity, 0))
 		return (NULL);
+	if (__builtin_expect(new != NULL, 1))
+		*new = false;
 	index = key & (map->capacity - 1);
 	while (map->entries[index].key != 0)
 	{
@@ -56,8 +58,10 @@ t_ecs_ulist	*qm_get(t_ecs_qmap *map, uint64_t key)
 			return (&(map->entries + index)->query);
 		index = (index + 1) & (map->capacity - 1);
 	}
-	if (!list_create(&(map->entries + index)->query))
+	if (__builtin_expect(!list_create(&(map->entries + index)->query), 0))
 		return (NULL);
+	if (__builtin_expect(new != NULL, 1))
+		*new = true;
 	map->length++;
 	(map->entries + index)->key = key;
 	return (&(map->entries + index)->query);
