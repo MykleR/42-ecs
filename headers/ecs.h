@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:52:19 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/07 19:35:03 by mykle            ###   ########.fr       */
+/*   Updated: 2024/12/21 13:11:01 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 #  define ECS_ENTITY_CAP 42000
 # endif
 
-# define ECS_USED_MASK 0x8000000000000000
+# define ECS_MASK_ALIVE 0x8000000000000000
 
 typedef struct s_ecs_flist
 {

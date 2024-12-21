@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 20:15:32 by mykle             #+#    #+#             */
-/*   Updated: 2024/12/20 18:19:44 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/21 13:10:06 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@
 # include <stdbool.h>
 # include "uint_list.h"
 
-# define ECS_QMAP_INIT_SIZE 8
+# ifndef ECS_QUERY_CAP
+#  define ECS_QUERY_CAP 8
+# endif
 
 typedef struct s_ecs_qentry
 {
@@ -27,7 +29,7 @@ typedef struct s_ecs_qentry
 
 typedef struct s_ecs_qmap
 {
-	t_ecs_qentry	entries[ECS_QMAP_INIT_SIZE];
+	t_ecs_qentry	entries[ECS_QUERY_CAP];
 	uint16_t		capacity;
 	uint16_t		length;
 }					t_ecs_qmap;

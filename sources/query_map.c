@@ -6,7 +6,7 @@
 /*   By: mrouves <mrouves@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 13:23:20 by mrouves           #+#    #+#             */
-/*   Updated: 2024/12/20 18:21:46 by mrouves          ###   ########.fr       */
+/*   Updated: 2024/12/21 13:10:25 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ bool	qm_create(t_ecs_qmap *map)
 {
 	uint16_t	capacity;
 
-	capacity = ECS_QMAP_INIT_SIZE - 1;
+	capacity = ECS_QUERY_CAP - 1;
 	capacity |= capacity >> 1;
 	capacity |= capacity >> 2;
 	capacity |= capacity >> 4;
