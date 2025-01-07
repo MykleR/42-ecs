@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 23:16:35 by mykle             #+#    #+#             */
-/*   Updated: 2024/12/07 19:39:43 by mykle            ###   ########.fr       */
+/*   Updated: 2025/01/08 00:02:23 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,13 @@ UTEST(ecs, entity_create)
 {
 	id = ecs_entity_create(ecs);
 	EXPECT_EQ(id, 0L);
-	EXPECT_EQ(ecs->masks[id], ECS_USED_MASK);
+	EXPECT_EQ(ecs->masks[id], ECS_MASK_ALIVE);
 }
 
 UTEST(ecs, entity_add)
 {
 	ecs_entity_add(ecs, id, POS, &(t_vector){X, Y});
-	ASSERT_EQ(ecs->masks[id], (ECS_USED_MASK | (1UL << POS)));
+	ASSERT_EQ(ecs->masks[id], (ECS_MASK_ALIVE | (1UL << POS)));
 }
 
 UTEST(ecs, entity_get)
