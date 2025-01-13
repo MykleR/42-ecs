@@ -6,7 +6,7 @@
 /*   By: mykle <mykle@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:52 by mykle             #+#    #+#             */
-/*   Updated: 2024/11/27 13:23:31 by mykle            ###   ########.fr       */
+/*   Updated: 2025/01/13 20:48:16 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,75 @@
 #include <string.h>
 
 #define ECS_ENTITY_CAP 1024
-#define ECS_UINT64_MAP_CAP 16
 
 #define ECS_ALIVE 0x8000000000000000
 
-typedef struct s_ecs_archetype
-{
-	uint64_t			signature;
-	void				*data;
-	uint32_t			*ids;
-	uint32_t			mem_size;
-	uint32_t			count;
-}	t_ecs_archetype;
 
+//
+//	DOUBLE LINKED LIST TYPE
+//
+typedef struct s_double_linked_list
+{
+	struct s_double_linked_list	*prev;
+	struct s_double_linked_list	*next;
+	void						*data;
+}	t_dl_list;
+
+t_dl_list	*dl_list_node(void *data)
+{
+	t_dl_list	*node;
+
+	node = malloc(sizeof(t_dl_list));
+	if (!node)
+		return (NULL);
+	node->data = data;
+	node->next = NULL;
+	node->prev = NULL;
+	return (node);
+}
+
+void	dl_list_insert(t_dl_list **after, t_dl_list *node)
+{
+	if (__builtin_expect(!after, 0))
+		return ;
+	if (!(*after))
+	{
+		*after = node;
+		return ;
+	}
+	node->next = (*after)->next;
+	node->prev = (*after);
+	(*after)->next = node;
+	if (node->next)
+		node->next->prev = node;
+}
+
+void	dl_list_delone(t_dl_list **node, void (*del)(void *))
+{
+	if (__builtin_expect(!node || !(*node), 0))
+		return ;
+	if ((*node)->prev)
+		(*node)->prev->next = (*node)->next;
+	if ((*node)->next)
+		(*node)->next->prev = (*node)->prev;
+	if (del)
+		del((*node)->data);
+	free(*node);
+	*node = NULL;
+}
+
+void	dl_list_iter(t_dl_list *head, void (*f)(t_dl_list *, void *), void *arg)
+{
+	while (head)
+	{
+		f(head, arg);
+		head = head->next;
+	}
+}
+
+//
+//	UNORDERED MAP
+//
 typedef struct s_uint64_entry
 {
 	uint64_t	key;
@@ -38,24 +94,71 @@ typedef struct s_uint64_entry
 
 typedef struct s_uint64_map
 {
-	t_uint64_entry	entries[ECS_UINT64_MAP_CAP];
-	uint16_t		count;
-	uint16_t		cap;
+	t_uint64_entry	*entries;
+	uint32_t		len;
+	uint32_t		cap;
 }	t_uint64_map;
+
+bool	map_create(t_uint64_map *map, uint32_t cap)
+{
+	cap--;
+	cap |= cap >> 1;
+	cap |= cap >> 2;
+	cap |= cap >> 4;
+	cap |= cap >> 8;
+	cap |= cap >> 16;
+	cap++;
+	if (__builtin_expect(!map || !cap, 0))
+		return (false);
+	map->cap = cap;
+	map->len = 0;
+	map->entries = calloc(sizeof(t_uint64_entry), cap);
+	return (map->entries != NULL);
+}
+
+void	map_destroy(t_uint64_map *map)
+{
+	if (__builtin_expect(!map, 0))
+		return ;
+	free(map->entries);
+	map->len = 0;
+	map->cap = 0;
+	map->entries = NULL;
+}
+
+void	*map_get(t_uint64_map *map, uint64_t key)
+{
+	uint64_t	index;
+	t_u
+	
+	if (__builtin_expect(!map, 0))
+		return (NULL);
+	index = key & (map->cap - 1);
+	
+}
 
 typedef struct s_free_list
 {
 	struct s_free_list	*next;
 }	t_free_list;
 
+typedef struct s_ecs_archetype
+{
+	void				*data;
+	uint32_t			*ids;
+	uint64_t			mask;
+	uint32_t			len;
+	uint32_t			cap;
+	uint16_t			mem_size;
+}	t_ecs_archetype;
+
 typedef struct s_ecs
 {
-	t_uint64_map	*archetypes;
-	t_uint64_map	*comps;
-	t_free_list		*free_list;
 	uint64_t		masks[ECS_ENTITY_CAP];
-	uint64_t		ids[ECS_ENTITY_CAP];
-	uint32_t		count;
+	t_free_list		*free_list;
+	t_uint64_map	archetypes;
+	t_uint64_map	comps;
+	uint32_t		len;
 	uint16_t		comp_size[63];
 	uint8_t			comp_nb;
 }	t_ecs;
