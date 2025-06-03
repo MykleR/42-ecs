@@ -48,11 +48,6 @@ fclean: clean
 	@rm -f $(NAME)
 	@printf "Cleaned $(BOLD)$(NAME)$(END)\n"
 
-test: $(NAME)
-	@$(CC) $(CFLAGS) $(IFLAGS) -I $(DIR_TESTS) $(DIR_TESTS)/tests.c $(NAME)
-	@./a.out
-	@rm a.out
-
 re: fclean all
 
 .PHONY: clean fclean re all
