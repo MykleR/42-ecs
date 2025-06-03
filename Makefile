@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME 			:= lib-ecs.a
+NAME 			:= 42-ecs.a
 
 DIR_HEADERS		:= headers
 DIR_SOURCES		:= sources
