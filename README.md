@@ -1,6 +1,6 @@
 # 42-ecs
 
-A simple but fast C Entity Component System (ECS) library designed for 42 School C common core projects.
+A simple but fast C Entity Component System (ECS) library designed for 42 School C common core projects. Follows C common core norm v4.
 This ECS library was actively used in the [so_long](https://github.com/MykleR/so_long) game project, demonstrating its practical application in 42 School projects.
 
 ## Features
