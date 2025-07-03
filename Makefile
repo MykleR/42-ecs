@@ -9,7 +9,7 @@ include $(DIR_SOURCES)/sources.mk
 OBJS			:= $(addprefix $(DIR_OBJS)/, $(SOURCES:%.c=%.o))
 
 CC				:= cc
-CFLAGS			:= -Wall -Wextra -Werror -g
+CFLAGS			:= -Wall -Wextra -Werror -O3
 IFLAGS			:= -I $(DIR_HEADERS)
 
 GREEN			= \033[0;32m
