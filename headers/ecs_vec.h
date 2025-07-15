@@ -10,16 +10,24 @@
 #define ECS_VEC_MAXCAP 0x2000000000
 #endif
 
+typedef uint64_t u64;
+typedef uint_fast32_t u32;
+typedef uint_fast16_t u16;
+typedef uint_fast8_t u8;
+typedef int64_t i64;
+typedef int_fast32_t i32;
+typedef int_fast16_t i16;
+typedef int_fast8_t i8;
 
 typedef struct s_ecs_vec {
   void *data;
-  uint64_t cap;
-  uint64_t len;
-  uint64_t mem_size;
+  u64 cap;
+  u64 len;
+  u64 mem_size;
 } t_ecs_vec;
 
 #define ECS_VEC_DEFAULT                                                        \
-  (t_ecs_vec){.data = NULL, .cap = 0, .len = 0, .mem_size = 0}
+	(t_ecs_vec){.data = NULL, .cap = 0, .len = 0, .mem_size = 0}
 
 #define ECS_VEC_CAST(vec, cast) ((cast *)((vec).data))
 
@@ -41,7 +49,7 @@ typedef struct s_ecs_vec {
 } while (0)
 
 #define ECS_VEC_INIT(vec, type, capacity) do {                                 \
-	(vec).len = 0;                                                             \
+	(vec) = ECS_VEC_DEFAULT;												   \
 	(vec).data = calloc(sizeof(type), (capacity));                             \
 	__ECS_VEC_CHECKINIT(vec);                                                  \
 	(vec).cap = (capacity);                                                    \
@@ -67,11 +75,11 @@ typedef struct s_ecs_vec {
 
 #define ECS_VEC_REMOVE(vec, index, ...) do {                                   \
 	if (__ECS_VEC_NEXPECT_OUT((vec), (index))) break;                          \
-	void *const _item = __ECS_VEC_PTR(vec, index);                              \
+	void *const _item = __ECS_VEC_PTR(vec, index);                             \
     {__VA_ARGS__}                                                              \
     --(vec).len;                                                               \
 	if (__ECS_VEC_EXPECT_IN(vec, index))                                       \
-		memcpy(item, __ECS_VEC_PTR(vec, (vec).len), (vec).mem_size);           \
+		memcpy(_item, __ECS_VEC_PTR(vec, (vec).len), (vec).mem_size);          \
 } while (0)
 
 #define ECS_VEC_CLEAR(vec) do {                                                \
@@ -79,8 +87,8 @@ typedef struct s_ecs_vec {
 } while (0)
 
 #define ECS_VEC_ITER(vec, ...) do {                                            \
-	for (uint64_t it = 0; it < (vec).len; ++it) {                              \
-		 void *const _item = __ECS_VEC_PTR((vec), it);                          \
+	for (u64 it = 0; it < (vec).len; ++it) {                              \
+		 void *const _item = __ECS_VEC_PTR((vec), it);                         \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
 } while (0)
@@ -111,8 +119,8 @@ typedef struct s_ecs_vec {
 #  define __ECS_VEC_CHECKINIT(vec)                                             \
 	if (__ECS_VEC_NINIT(vec)) break;
 
-#  define __ECS_VEC_MULT(x)                                                     \
-  ((uint64_t)((x) << 1) >> 1 != (x)) ? UINT64_MAX : (x) << 1
+#  define __ECS_VEC_MULT(x)                                                    \
+	((u64)((x) << 1) >> 1 != (x)) ? UINT64_MAX : (x) << 1
 
 #  define __ECS_VEC_REALLOC(vec)                                               \
 {                                                                              \

@@ -2,6 +2,7 @@
 
 #include <ecs_vec.h>
 #include <ecs_archetype.h>
+#include <ecs_log.h>
 
 typedef struct s_ecs_free_list
 {
