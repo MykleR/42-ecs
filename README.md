@@ -1,7 +1,7 @@
 <p align="center"><img src="https://github.com/MykleR/42-ecs/blob/main/42-ecs-logo.png" alt="logo" width="200" align="center"/></p>
 <h1 id="logo" align="center"> 42-ECS </h1>
 
-Simple but fast Entity Component System (ECS) library designed for 42 School C common core projects. Follows Norm v4.
+Easy and fast Entity Component System (ECS) library designed for 42 School C common core projects. Follows Norm v4.
 Example use in [so_long](https://github.com/MykleR/so_long) game project.
 
 ## Features
