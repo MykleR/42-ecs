@@ -1,33 +1,41 @@
 #pragma once
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+# include <stdbool.h>
+# include <stddef.h>
+# include <stdint.h>
+# include <stdlib.h>
+# include <string.h>
 
-#ifndef ECS_VEC_MAXCAP
-#define ECS_VEC_MAXCAP 0x2000000000
-#endif
+# ifndef ECS_VEC_MAXCAP
+#  define ECS_VEC_MAXCAP 0x2000000000
+# endif
 
-typedef uint64_t u64;
-typedef uint_fast32_t u32;
-typedef uint_fast16_t u16;
-typedef uint_fast8_t u8;
-typedef int64_t i64;
-typedef int_fast32_t i32;
-typedef int_fast16_t i16;
-typedef int_fast8_t i8;
+
+// ╔═════════════════════════[ DEFINITION ]═════════════════════════╗
+
+typedef uint64_t		u64;
+typedef uint_fast32_t	u32;
+typedef uint_fast16_t	u16;
+typedef uint_fast8_t	u8;
+typedef int64_t			i64;
+typedef int_fast32_t	i32;
+typedef int_fast16_t	i16;
+typedef int_fast8_t		i8;
 
 typedef struct s_ecs_vec {
-  void *data;
-  u64 cap;
-  u64 len;
-  u64 mem_size;
+	void *data;
+	u64 cap;
+	u64 len;
+	u64 mem_size;
 } t_ecs_vec;
 
-#define ECS_VEC_DEFAULT                                                        \
-	(t_ecs_vec){.data = NULL, .cap = 0, .len = 0, .mem_size = 0}
+
+// ╔═══════════════════════════[ MACROS ]═══════════════════════════╗
+
+// ----- ACCESSORS -----
+
+#define ECS_VEC_DEFAULT (t_ecs_vec)                                            \
+	{.data = NULL, .cap = 0, .len = 0, .mem_size = 0}
 
 #define ECS_VEC_CAST(vec, cast) ((cast *)((vec).data))
 
@@ -47,6 +55,8 @@ typedef struct s_ecs_vec {
 	if (__ECS_VEC_EXPECT_IN(vec, index))                                       \
 		memcpy(__ECS_VEC_PTR(vec, index), (value), (vec).mem_size);            \
 } while (0)
+
+// ----- MODIFIERS -----
 
 #define ECS_VEC_INIT(vec, type, capacity) do {                                 \
 	(vec) = ECS_VEC_DEFAULT;												   \
@@ -87,7 +97,7 @@ typedef struct s_ecs_vec {
 } while (0)
 
 #define ECS_VEC_ITER(vec, ...) do {                                            \
-	for (u64 it = 0; it < (vec).len; ++it) {                              \
+	for (u64 it = 0; it < (vec).len; ++it) {                                   \
 		 void *const _item = __ECS_VEC_PTR((vec), it);                         \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
@@ -98,39 +108,34 @@ typedef struct s_ecs_vec {
 	ECS_VEC_CLEAR(vec);                                                        \
 } while (0)
 
-# ifndef ECS_VEC_UTILS
-#  define ECS_VEC_UTILS
 
-#  define UNUSED(x) (void)(x)
+// ╔═══════════════════════════[ UTILS ]════════════════════════════╗
 
-#  define __ECS_VEC_NEXPECT_OUT(vec, index)                                    \
+# define UNUSED(x) (void)(x)
+
+# define __ECS_VEC_NEXPECT_OUT(vec, index)                                    \
 	(__builtin_expect((index) >= (vec).len, 0))
 
-#  define __ECS_VEC_EXPECT_IN(vec, index)                                      \
+# define __ECS_VEC_EXPECT_IN(vec, index)                                      \
 	(__builtin_expect((index) < (vec).len, 1))
 
-#  define __ECS_VEC_NINIT(vec)                                                 \
+# define __ECS_VEC_NINIT(vec)                                                 \
 	(__builtin_expect((vec).data == NULL, 0))
 
-#  define __ECS_VEC_PTR(vec, index)                                            \
+# define __ECS_VEC_PTR(vec, index)                                            \
 	((void *const)((vec).data + ((index) * (vec).mem_size)))
 
-
-#  define __ECS_VEC_CHECKINIT(vec)                                             \
+# define __ECS_VEC_CHECKINIT(vec)                                             \
 	if (__ECS_VEC_NINIT(vec)) break;
 
-#  define __ECS_VEC_MULT(x)                                                    \
+# define __ECS_VEC_MULT(x)                                                    \
 	((u64)((x) << 1) >> 1 != (x)) ? UINT64_MAX : (x) << 1
 
-#  define __ECS_VEC_REALLOC(vec)                                               \
-{                                                                              \
-	if (__builtin_expect((vec).cap >= ECS_VEC_MAXCAP, 0))                      \
-		break;                                                                 \
-	if (__builtin_expect((vec).len >= (vec).cap, 0)) {                         \
-		(vec).cap = __ECS_VEC_MULT((vec).cap);                                 \
-		void *new_data = realloc((vec).data, (vec).cap * (vec).mem_size);      \
-		(vec).data = new_data;                                                 \
-	}                                                                          \
-}
-
-# endif
+# define __ECS_VEC_REALLOC(vec)                                               \
+	if (__builtin_expect((vec).cap >= ECS_VEC_MAXCAP, 0))                     \
+		break;                                                                \
+	if (__builtin_expect((vec).len >= (vec).cap, 0)) {                        \
+		(vec).cap = __ECS_VEC_MULT((vec).cap);                                \
+		void *new_data = realloc((vec).data, (vec).cap * (vec).mem_size);     \
+		(vec).data = new_data;                                                \
+	}                                                                         \
