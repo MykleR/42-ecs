@@ -143,7 +143,7 @@ This creates `42-ecs.a` that you can link to your projects.
 3. Make sure to also link any required dependencies (like your utils library)
 
 ```bash
-gcc -I./42-ecs.a/headers your_project.c 42-ecs/42-ecs.a -o your_program
+gcc -I 42-ecs/headers your_project.c 42-ecs/42-ecs.a -o your_program
 ```
 
 ### Example Systems
