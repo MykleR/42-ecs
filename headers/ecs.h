@@ -3,6 +3,7 @@
 #include <ecs_vec.h>
 #include <ecs_archetype.h>
 #include <ecs_log.h>
+#include <ecs_event.h>
 
 # ifndef ECS_ENTITY_MAX
 #  define ECS_ENTITY_MAX 0x100000
@@ -42,15 +43,11 @@ typedef struct s_ecs
 	.next_id = NULL \
 }
 
-# define __ECS_INIT_COMP(ARG, IDX) \
-	(ecs).comp_count += (ecs).comp_count < ECS_ARCH_MAXCOMP; \
-	(ecs).comp_sizes[IDX] = sizeof(ARG); \
-
 # define ECS_INIT(ecs, ...) do { \
 	(ecs) = ECS_DEFAULT; \
-	PP_EACH_IDX(__ECS_INIT_COMP, __VA_ARGS__); \
+	PP_EACH(__ECS_INIT_COMP, __VA_ARGS__); \
 	ECS_VEC_INIT((ecs).archetypes, t_ecs_archetype, ECS_INITSIZE); \
-	ECS_VEC_INIT((ecs).queries, sizeof(void*), ECS_INITSIZE); \
+	ECS_VEC_INIT((ecs).queries, void*, ECS_INITSIZE); \
 	ECS_VEC_INIT((ecs).entities, u32, ECS_ENTITY_INITSIZE); \
 } while (0)
 
@@ -61,6 +58,21 @@ typedef struct s_ecs
 	ECS_VEC_DESTROY((ecs).queries); \
 	ECS_VEC_DESTROY((ecs).entities); \
 	(ecs) = ECS_DEFAULT; \
+} while (0)
+
+// ╔═══════════════════════════[ UTILS ]════════════════════════════╗
+
+# define __ECS_INIT_COMP(ARG) \
+	(ecs).comp_sizes[(ecs).comp_count++] = sizeof(ARG); \
+
+# define __ECS_LOG(ecs) do { \
+	LOG_DEBUG("ECS: %lu entities, %lu components", (ecs).entity_count, (ecs).comp_count); \
+	LOG_DEBUG("Archetypes: %lu", (ecs).archetypes.len); \
+	LOG_DEBUG("Queries: %lu", (ecs).queries.len); \
+	for (u16 i = 0; i < (ecs).comp_count; i++) \
+		LOG_DEBUG("Comp[%lu]: size_t(%lu)", i, (ecs).comp_sizes[i]); \
+	for (u32 i = 0; i < (ecs).entities.len; i++) \
+		LOG_DEBUG("Entity[%lu]: %lu", i, ECS_VEC_GET((ecs).entities, u64, i)); \
 } while (0)
 
 // int				ecs_init(t_ecs *ecs, u16 comp_count, ...);

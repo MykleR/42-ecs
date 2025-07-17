@@ -111,7 +111,8 @@ typedef struct s_ecs_vec {
 
 // ╔═══════════════════════════[ UTILS ]════════════════════════════╗
 
-# define UNUSED(x) (void)(x)
+# define UNUSED_V(x) (void)(x)
+# define UNUSED_A __attribute__((unused))
 
 # define __ECS_VEC_NEXPECT_OUT(vec, index)                                    \
 	(__builtin_expect((index) >= (vec).len, 0))
