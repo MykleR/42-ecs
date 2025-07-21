@@ -1,10 +1,10 @@
 #pragma once
 
 # include <stdbool.h>
-# include <stddef.h>
 # include <stdint.h>
 # include <stdlib.h>
 # include <string.h>
+# include <assert.h>
 
 # ifndef ECS_VEC_MAXCAP
 #  define ECS_VEC_MAXCAP 0x2000000000
@@ -45,11 +45,17 @@ typedef struct s_ecs_vec {
 #define ECS_VEC_NOT_EMPTY(vec)                                                 \
 	__ECS_VEC_EXPECT_IN(vec, 0)
 
-#define ECS_VEC_TOP(vec, cast) *(cast *)(                                      \
-	ECS_VEC_NOT_EMPTY(vec) ? __ECS_VEC_PTR(vec, (vec).len - 1) : NULL)         \
+#define ECS_VEC_TOP(vec, cast) ({ \
+	assert(ECS_VEC_NOT_EMPTY(vec));                                            \
+	cast _val = *(cast *)(__ECS_VEC_PTR(vec, (vec).len - 1));                  \
+	_val;                                                                      \
+})
 
-#define ECS_VEC_GET(vec, cast, index) *(cast *)(                               \
-	__ECS_VEC_EXPECT_IN(vec, index) ? __ECS_VEC_PTR(vec, index) : NULL)        \
+#define ECS_VEC_GET(vec, index, cast) ({                                       \
+	assert(__ECS_VEC_EXPECT_IN(vec, index));                                   \
+	cast _val = *(cast *)(__ECS_VEC_PTR(vec, index));                          \
+	_val;                                                                      \
+})
 
 #define ECS_VEC_SET(vec, index, value) do {                                    \
 	if (__ECS_VEC_EXPECT_IN(vec, index))                                       \
@@ -99,6 +105,13 @@ typedef struct s_ecs_vec {
 #define ECS_VEC_ITER(vec, ...) do {                                            \
 	for (u64 it = 0; it < (vec).len; ++it) {                                   \
 		 void *const _item = __ECS_VEC_PTR((vec), it);                         \
+		{__VA_ARGS__}                                                          \
+	}                                                                          \
+} while (0)
+
+# define ECS_VEC_FOREACH(vec, type, ...) do {                                  \
+	for (u64 it = 0; it < (vec).len; ++it) {                                   \
+		type *const _item = (type *)__ECS_VEC_PTR((vec), it);                  \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
 } while (0)

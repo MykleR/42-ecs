@@ -23,7 +23,7 @@ typedef struct s_ecs_archetype
 
 // ╔═══════════════════════════[ MACROS ]═══════════════════════════╗
 
-#define ECS_ARCH_DEFAULT (t_ecs_archetype) { \
+# define ECS_ARCH_DEFAULT (t_ecs_archetype) { \
 	.comp_sizes = {0}, \
 	.comp_datas = {0}, \
 	.comp_count = 0, \
@@ -31,19 +31,25 @@ typedef struct s_ecs_archetype
 	.count = 0, \
 	.ids = {0}}
 
-#define ECS_ARCH_INIT(arch, sig, ...) do { \
+# define ECS_ARCH_INIT(arch, sig, ...) do { \
 	(arch) = ECS_ARCH_DEFAULT; \
 	(arch).signature = sig; \
 	PP_EACH_IDX(__ECS_ARCH_SETUP_COMP, __VA_ARGS__); \
 	ECS_VEC_INIT((arch).ids, u32, ECS_ARCH_INITSIZE); \
 } while (0)
 
-#define ECS_ARCH_DESTROY(arch) do { \
+# define ECS_ARCH_DESTROY(arch) do { \
 	for (u16 i = 0; i < (arch).comp_count; i++) \
 		ECS_VEC_DESTROY((arch).comp_datas[i]); \
 	ECS_VEC_DESTROY((arch).ids); \
 	(arch) = ECS_ARCH_DEFAULT; \
 } while (0)
+
+// TODO : FETCH with correct index and type in data
+# define ECS_ARCH_GET(arch, comp_id, entity_id) ( \
+	assert(__ECS_VEC_EXPECT_IN((arch).ids, entity_id)), \
+	ECS_VEC_GET((arch).comp_datas[comp_id], 0, void *)) \
+)
 
 // ╔═══════════════════════════[ UTILS ]════════════════════════════╗
 
