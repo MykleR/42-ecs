@@ -32,86 +32,83 @@ typedef struct s_ecs_vec {
 
 // ╔═══════════════════════════[ MACROS ]═══════════════════════════╗
 
-// ----- ACCESSORS -----
+// ----- UTILS -----
 
-#define ECS_VEC_DEFAULT (t_ecs_vec)                                            \
-	{.data = NULL, .cap = 0, .len = 0, .mem_size = 0}
+# define UNUSED __attribute__((unused))
 
-#define ECS_VEC_CAST(vec, cast) ((cast *)((vec).data))
+#define ECS_VEC_DEFAULT (t_ecs_vec) {.data=NULL,.cap=0,.len=0,.mem_size=0}
+#define ECS_VEC_IS_INIT(vec)	__builtin_expect((vec).data != NULL, 1)
+#define ECS_VEC_NOT_INIT(vec)	__builtin_expect((vec).data == NULL, 0)
+#define ECS_VEC_EMPTY(vec)		__builtin_expect((vec).len == 0, 0)
+#define ECS_VEC_FULL(vec)		__builtin_expect((vec).len >= (vec).cap, 0)
+#define ECS_VEC_NOT_EMPTY(vec)	__builtin_expect((vec).len > 0, 1)
+#define ECS_VEC_IN(vec, index)	__builtin_expect((index) < (vec).len, 1)
+#define ECS_VEC_OUT(vec, index)	__builtin_expect((index) >= (vec).len, 0)
 
-#define ECS_VEC_EMPTY(vec)                                                     \
-	__ECS_VEC_NEXPECT_OUT(vec, 0)
+// ----- INITIALIZATION -----
 
-#define ECS_VEC_NOT_EMPTY(vec)                                                 \
-	__ECS_VEC_EXPECT_IN(vec, 0)
-
-#define ECS_VEC_TOP(vec, cast) ({ \
-	assert(ECS_VEC_NOT_EMPTY(vec));                                            \
-	cast _val = *(cast *)(__ECS_VEC_PTR(vec, (vec).len - 1));                  \
-	_val;                                                                      \
-})
-
-#define ECS_VEC_GET(vec, index, cast) ({                                       \
-	assert(__ECS_VEC_EXPECT_IN(vec, index));                                   \
-	cast _val = *(cast *)(__ECS_VEC_PTR(vec, index));                          \
-	_val;                                                                      \
-})
-
-#define ECS_VEC_SET(vec, index, value) do {                                    \
-	if (__ECS_VEC_EXPECT_IN(vec, index))                                       \
-		memcpy(__ECS_VEC_PTR(vec, index), (value), (vec).mem_size);            \
-} while (0)
-
-// ----- MODIFIERS -----
-
-#define ECS_VEC_INIT(vec, type, capacity) do {                                 \
-	(vec) = ECS_VEC_DEFAULT;												   \
-	(vec).data = calloc(sizeof(type), (capacity));                             \
-	__ECS_VEC_CHECKINIT(vec);                                                  \
-	(vec).cap = (capacity);                                                    \
-	(vec).mem_size = sizeof(type);                                             \
-} while (0)
+#define ECS_VEC_INIT(vec, type, capacity) (                                    \
+	__ASSERT_MSG(ECS_VEC_NOT_INIT(vec), "Vector already initialized"),         \
+	(vec) = (t_ecs_vec){.cap=capacity,.mem_size=sizeof(type),.data=0,.len=0},  \
+	(vec).data = calloc(sizeof(type), (capacity)),                             \
+	(vec).data != NULL                                                         \
+)
 
 #define ECS_VEC_DESTROY(vec) do {                                              \
 	free((vec).data);                                                          \
-	(vec).data = NULL;                                                         \
 	(vec) = ECS_VEC_DEFAULT;                                                   \
+} while (0)
+
+// ----- ACCESSORS -----
+
+#define ECS_VEC_TOP(vec, cast) (                                               \
+	__ASSERT_MSG(ECS_VEC_IS_INIT(vec), "Vector not initialized"),              \
+	__ASSERT_MSG(ECS_VEC_NOT_EMPTY(vec), "Vector is empty"),                   \
+	*(cast *)(__ECS_VEC_PTR(vec, (vec).len - 1))                               \
+)
+
+#define ECS_VEC_GET(vec, index, cast) (                                        \
+	__ASSERT_MSG(ECS_VEC_IS_INIT(vec), "Vector not initialized"),              \
+	__ASSERT_MSG(ECS_VEC_IN(vec, index), "Vector Index out of bounds"),        \
+	*(cast *)(__ECS_VEC_PTR(vec, index))                                       \
+)
+
+// ----- MODIFIERS -----
+
+#define ECS_VEC_CLEAR(vec) ((vec).len = 0;)
+
+#define ECS_VEC_SET(vec, index, value) do {                                    \
+	__ASSERT_MSG(ECS_VEC_IS_INIT(vec), "Vector not initialized");              \
+	__ASSERT_MSG(ECS_VEC_IN(vec, index), "Vector Index out of bounds");        \
+	memcpy(__ECS_VEC_PTR(vec, index), (value), (vec).mem_size);                \
 } while (0)
 
 #define ECS_VEC_PUSH(vec, value) do {                                          \
 	__ECS_VEC_REALLOC(vec);                                                    \
-	__ECS_VEC_CHECKINIT(vec);                                                  \
-	memcpy(__ECS_VEC_PTR(vec, (vec).len++), (value), (vec).mem_size);          \
+	__ASSERT_MSG(ECS_VEC_IS_INIT(vec), "Vector realloc failed");               \
+	memcpy(__ECS_VEC_PTR(vec, (vec).len++), &(value), (vec).mem_size);         \
 } while (0)
 
-#define ECS_VEC_POP(vec) do {                                                  \
-	if (ECS_VEC_NOT_EMPTY(vec))                                                \
-		(vec).len--;                                                           \
+#define ECS_VEC_POP(vec, ...) do {                                             \
+	__ECS_VEC_DELONE((vec), (vec).len, __VA_ARGS__)                            \
 } while (0)
 
 #define ECS_VEC_REMOVE(vec, index, ...) do {                                   \
-	if (__ECS_VEC_NEXPECT_OUT((vec), (index))) break;                          \
-	void *const _item = __ECS_VEC_PTR(vec, index);                             \
-    {__VA_ARGS__}                                                              \
-    --(vec).len;                                                               \
-	if (__ECS_VEC_EXPECT_IN(vec, index))                                       \
-		memcpy(_item, __ECS_VEC_PTR(vec, (vec).len), (vec).mem_size);          \
+	__ECS_VEC_DELONE((vec), (index), __VA_ARGS__)                              \
 } while (0)
 
-#define ECS_VEC_CLEAR(vec) do {                                                \
-	(vec).len = 0;                                                             \
-} while (0)
+// ----- ITERATORS -----
 
-#define ECS_VEC_ITER(vec, ...) do {                                            \
+#define ECS_VEC_FOREACH(vec, type, ...) do {                                   \
 	for (u64 it = 0; it < (vec).len; ++it) {                                   \
-		 void *const _item = __ECS_VEC_PTR((vec), it);                         \
+		type *const _item = __ECS_VEC_PTR(vec, it);                            \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
 } while (0)
 
-# define ECS_VEC_FOREACH(vec, type, ...) do {                                  \
+#define ECS_VEC_ITER(vec, type, ...) do {                                      \
 	for (u64 it = 0; it < (vec).len; ++it) {                                   \
-		type *const _item = (type *)__ECS_VEC_PTR((vec), it);                  \
+		type _item = ECS_VEC_GET(vec, it, type);                               \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
 } while (0)
@@ -122,34 +119,27 @@ typedef struct s_ecs_vec {
 } while (0)
 
 
-// ╔═══════════════════════════[ UTILS ]════════════════════════════╗
+// ╔═══════════════════════════[ INTERNALS ]═══════════════════════════╗
 
-# define UNUSED_V(x) (void)(x)
-# define UNUSED_A __attribute__((unused))
+# define __ASSERT_MSG(cond, msg) assert(cond && msg)
 
-# define __ECS_VEC_NEXPECT_OUT(vec, index)                                    \
-	(__builtin_expect((index) >= (vec).len, 0))
+# define __ECS_VEC_PTR(vec, index)                                             \
+	((vec).data + (index) * (vec).mem_size)
 
-# define __ECS_VEC_EXPECT_IN(vec, index)                                      \
-	(__builtin_expect((index) < (vec).len, 1))
+# define __ECS_VEC_REALLOC(vec)                                                \
+	__ASSERT_MSG(ECS_VEC_IS_INIT(vec), "Vector not initialized");              \
+	__ASSERT_MSG((vec).cap < ECS_VEC_MAXCAP, "Vector capacity overflow");	   \
+	if (ECS_VEC_FULL(vec)) {                                                   \
+		u64 new_cap = (vec).cap << 1;                                          \
+		(vec).cap = (new_cap >> 1) != (vec).cap ? UINT64_MAX : new_cap;        \
+		(vec).data = realloc((vec).data, (vec).cap * (vec).mem_size);          \
+	}
 
-# define __ECS_VEC_NINIT(vec)                                                 \
-	(__builtin_expect((vec).data == NULL, 0))
-
-# define __ECS_VEC_PTR(vec, index)                                            \
-	((void *const)((vec).data + ((index) * (vec).mem_size)))
-
-# define __ECS_VEC_CHECKINIT(vec)                                             \
-	if (__ECS_VEC_NINIT(vec)) break;
-
-# define __ECS_VEC_MULT(x)                                                    \
-	((u64)((x) << 1) >> 1 != (x)) ? UINT64_MAX : (x) << 1
-
-# define __ECS_VEC_REALLOC(vec)                                               \
-	if (__builtin_expect((vec).cap >= ECS_VEC_MAXCAP, 0))                     \
-		break;                                                                \
-	if (__builtin_expect((vec).len >= (vec).cap, 0)) {                        \
-		(vec).cap = __ECS_VEC_MULT((vec).cap);                                \
-		void *new_data = realloc((vec).data, (vec).cap * (vec).mem_size);     \
-		(vec).data = new_data;                                                \
-	}                                                                         \
+# define __ECS_VEC_DELONE(vec, index, ...) \
+	__ASSERT_MSG(ECS_VEC_IS_INIT(vec), "Vector not initialized");              \
+	__ASSERT_MSG(ECS_VEC_NOT_EMPTY(vec), "Vector is empty");                   \
+	void *const _item = __ECS_VEC_PTR(vec, index);                             \
+	--(vec).len;                                                               \
+	{__VA_ARGS__}                                                              \
+	if (ECS_VEC_IN(vec, index))                                                \
+		memcpy(_item, __ECS_VEC_PTR(vec, (vec).len), (vec).mem_size); 

@@ -28,4 +28,4 @@
 # define LOG_WARN(msg, ...)		__LOG(YELLOW, "warning: ", msg, ##__VA_ARGS__)
 # define LOG_OK(msg, ...)		__LOG(GREEN,	 "done: ", msg, ##__VA_ARGS__)
 # define LOG_ERR(msg, ...)		__LOG(RED,		"error: ", msg, ##__VA_ARGS__)
-# define LOG_FATAL(ret, msg, ...)	__LOG(RED,		"fatal: ", msg, ##__VA_ARGS__); return ret
+# define LOG_FATAL(ret, msg, ...)	({__LOG(RED,		"fatal: ", msg, ##__VA_ARGS__); return ret;})

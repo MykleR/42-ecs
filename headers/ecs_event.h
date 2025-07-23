@@ -74,7 +74,7 @@
 			.callback = callback, \
 			.data = user_data \
 		}; \
-		ECS_VEC_PUSH(event->listeners, &listener); \
+		ECS_VEC_PUSH(event->listeners, listener); \
 		return (1); \
 	} \
 
@@ -82,7 +82,7 @@
 	int event_unsub_##name(t_ecs_event_callback_##name callback) { \
 		t_ecs_event_##name* event = event_get_##name(); \
 		for (u64 i = 0; i < event->listeners.len; ++i) { \
-			t_ecs_event_listener_##name listener = ECS_VEC_GET(event->listeners, t_ecs_event_listener_##name, i); \
+			t_ecs_event_listener_##name listener = ECS_VEC_GET(event->listeners, i, t_ecs_event_listener_##name); \
 			if (listener.callback == callback) { \
 				ECS_VEC_REMOVE(event->listeners, i); \
 				return 1; \
@@ -94,8 +94,7 @@
 # define __ECS_EVENT_DEFINE_RAISE(name) \
 	void event_raise_##name(t_ecs_event_data_##name* data) { \
 		t_ecs_event_##name* event = event_get_##name(); \
-		ECS_VEC_ITER(event->listeners, { \
-			t_ecs_event_listener_##name* listener = (t_ecs_event_listener_##name*)_item; \
-			listener->callback(data, listener->data); \
+		ECS_VEC_ITER(event->listeners, t_ecs_event_listener_##name, { \
+			_item.callback(data, _item.data); \
 		}); \
 	} \

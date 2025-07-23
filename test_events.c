@@ -1,4 +1,3 @@
-#include "ecs_event.h"
 #include <ecs.h>
 
 typedef struct s_vec2 {float x; float y; } t_vec2;
@@ -6,15 +5,15 @@ typedef struct s_vec3 {float x; float y; float z; } t_vec3;
 ECS_EVENT(vec2, t_vec2)
 ECS_EVENT(vec3, t_vec3)
 
-void on_vec2_event(t_vec2* event_data, UNUSED_A void* user_data) {
+void on_vec2_event(t_vec2* event_data, UNUSED void* user_data) {
 	LOG_DEBUG(BOLD("Vec2")COLOR(BLUE," Event 1")" - x: %f, y: %f", event_data->x, event_data->y);
 }
 
-void on_vec2_event2(t_vec2* event_data, UNUSED_A void* user_data) {
+void on_vec2_event2(t_vec2* event_data, UNUSED void* user_data) {
 	LOG_DEBUG(BOLD("Vec2")COLOR(GREEN," Event 2")" - x: %f, y: %f", event_data->x, event_data->y);
 }
 
-void on_vec3_event(t_vec3* event_data, UNUSED_A void* user_data) {
+void on_vec3_event(t_vec3* event_data, UNUSED void* user_data) {
 	LOG_DEBUG(BOLD("Vec3")COLOR(BLUE," Event 1")" - x: %f, y: %f, z: %f", event_data->x, event_data->y, event_data->z);
 }
 
