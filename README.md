@@ -14,7 +14,7 @@ Easy and fast ECS library designed for 42 School C common core projects.
 Example use in [so_long](https://github.com/MykleR/so_long) (more to come).
 
 > [!NOTE]\
-> What is an ECS ? ECS, or Entity-Component-System, is a software architectural pattern commonly used in game development that organizes game objects into entities, components, and systems. promoting code reusability and performance.
+> ECS, or Entity-Component-System, is a software architectural pattern commonly used in game development that organizes game objects into entities, components, and systems. promoting code reusability and performance.
 > - Entities are unique identifiers,
 > - components are data without behavior,
 > - and systems are processes that operate on entities with specific components
