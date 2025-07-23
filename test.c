@@ -26,12 +26,21 @@ int main(void)
 	LOG_INFO("Popping last item...");
 	ECS_VEC_POP(vec);
 
+	for (int i = 0; i < N - 2; ++i) {
+		int UNUSED x = ECS_VEC_GET(vec, 0, int);
+	}
+
 	for (int i = 0; i < N - 2; ++i)
 		ECS_VEC_REMOVE(vec, 0);
 
 	if (ECS_VEC_EMPTY(vec))
 		LOG_OK("Vector is empty");
 	else LOG_ERR("Vector should be empty");
+	
+	for (int i = 0; i < N; ++i)
+		ECS_VEC_PUSH(vec, (int){i * 2});
+	for (int i = 0; i < N; ++i)
+		ECS_VEC_POP(vec);
 
 	ECS_VEC_DESTROY(vec);
 	return 0;

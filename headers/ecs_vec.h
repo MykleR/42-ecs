@@ -42,8 +42,8 @@ typedef struct s_ecs_vec {
 #define ECS_VEC_EMPTY(vec)		__builtin_expect((vec).len == 0, 0)
 #define ECS_VEC_FULL(vec)		__builtin_expect((vec).len >= (vec).cap, 0)
 #define ECS_VEC_NOT_EMPTY(vec)	__builtin_expect((vec).len > 0, 1)
-#define ECS_VEC_IN(vec, index)	__builtin_expect((index) < (vec).len, 1)
-#define ECS_VEC_OUT(vec, index)	__builtin_expect((index) >= (vec).len, 0)
+#define ECS_VEC_IN(vec, index)	__builtin_expect((u64)(index) < (vec).len, 1)
+#define ECS_VEC_OUT(vec, index)	__builtin_expect((u64)(index) >= (vec).len, 0)
 
 // ----- INITIALIZATION -----
 
