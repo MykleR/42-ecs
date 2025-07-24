@@ -1,47 +1,11 @@
-#include <ecs_vec.h>
-#include <ecs_log.h>
+#include <ecs.h>
 
-#define N 9900000
+int main() {
+	t_ecs ecs = ECS_DEFAULT;
+	ECS_INIT(ecs, u32, u64, float);
 
-int main(void)
-{
-	t_ecs_vec vec = ECS_VEC_DEFAULT;
-	if (!ECS_VEC_INIT(vec, int, 4))
-		LOG_FATAL(1, "Failed to initialize vector");
-	else LOG_OK("Vector initialized successfully");
-	
-	for (int i = 0; i < N; ++i)
-		ECS_VEC_PUSH(vec, (int){i * 2});
-	LOG_INFO("Vector contents:");
-	ECS_VEC_ITER(vec, int, LOG_DEBUG("Item %lu: %d", it, _item););
+	__ECS_LOG(ecs);
 
-	LOG_INFO("Removing item at index 2...");
-	ECS_VEC_REMOVE(vec, 2);
-	ECS_VEC_ITER(vec, int, LOG_DEBUG("Item %lu: %d", it, _item););
-
-	if (ECS_VEC_NOT_EMPTY(vec))
-		LOG_OK("Vector is not empty");
-	else LOG_ERR("Vector should not be empty");
-
-	LOG_INFO("Popping last item...");
-	ECS_VEC_POP(vec);
-
-	for (int i = 0; i < N - 2; ++i) {
-		int UNUSED x = ECS_VEC_GET(vec, 0, int);
-	}
-
-	for (int i = 0; i < N - 2; ++i)
-		ECS_VEC_REMOVE(vec, 0);
-
-	if (ECS_VEC_EMPTY(vec))
-		LOG_OK("Vector is empty");
-	else LOG_ERR("Vector should be empty");
-	
-	for (int i = 0; i < N; ++i)
-		ECS_VEC_PUSH(vec, (int){i * 2});
-	for (int i = 0; i < N; ++i)
-		ECS_VEC_POP(vec);
-
-	ECS_VEC_DESTROY(vec);
+	ECS_DESTROY(ecs);
 	return 0;
 }

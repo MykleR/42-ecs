@@ -10,15 +10,15 @@
 	__ECS_EVENT_DEFINE_STOP(name) \
 	__ECS_EVENT_DEFINE_SUB(name) \
 	__ECS_EVENT_DEFINE_UNSUB(name) \
-	__ECS_EVENT_DEFINE_RAISE(name) \
+	__ECS_EVENT_DEFINE_RAISE(name)
 
 # define ECS_EVENT_DECLARE(name, type) \
 	__ECS_EVENT_DECLARE_TYPE(name, type) \
-	__ECS_EVENT_DECLARE_FUNCTIONS(name) \
+	__ECS_EVENT_DECLARE_FUNCTIONS(name)
 
 # define ECS_EVENT(name, type) \
 	ECS_EVENT_DECLARE(name, type) \
-	ECS_EVENT_DEFINE(name) \
+	ECS_EVENT_DEFINE(name)
 
 // ╔═══════════════════════════[ UTILS ]════════════════════════════╗
 
@@ -34,14 +34,14 @@
 	typedef struct { \
 		t_ecs_vec	listeners; \
 		int			instancied; \
-	} t_ecs_event_##name; \
+	} t_ecs_event_##name;
 
 # define __ECS_EVENT_DECLARE_FUNCTIONS(name) \
 	t_ecs_event_##name* event_get_##name(void); \
 	void __event_stop_##name(void); \
 	int event_sub_##name(t_ecs_event_callback_##name callback, void* user_data); \
 	int event_unsub_##name(t_ecs_event_callback_##name callback); \
-	void event_raise_##name(t_ecs_event_data_##name* data); \
+	void event_raise_##name(t_ecs_event_data_##name* data);
 
 # define __ECS_EVENT_INIT(event, name) do { \
 	ECS_VEC_INIT((event).listeners, t_ecs_event_listener_##name, 0x100); \
@@ -58,14 +58,14 @@
 		static t_ecs_event_##name event = {0}; \
 		if (!event.instancied) __ECS_EVENT_INIT(event, name); \
 		return &event; \
-	} \
+	}
 
 # define __ECS_EVENT_DEFINE_STOP(name) \
 	__attribute__((destructor)) \
 	void __event_stop_##name(void) { \
 		t_ecs_event_##name* event = event_get_##name(); \
 		__ECS_EVENT_DESTROY(*event, name); \
-	} \
+	}
 
 # define __ECS_EVENT_DEFINE_SUB(name) \
 	int event_sub_##name(t_ecs_event_callback_##name callback, void* user_data) { \
@@ -76,7 +76,7 @@
 		}; \
 		ECS_VEC_PUSH(event->listeners, listener); \
 		return (1); \
-	} \
+	}
 
 # define __ECS_EVENT_DEFINE_UNSUB(name) \
 	int event_unsub_##name(t_ecs_event_callback_##name callback) { \
@@ -89,7 +89,7 @@
 			} \
 		} \
 		return 0; \
-	} \
+	}
 
 # define __ECS_EVENT_DEFINE_RAISE(name) \
 	void event_raise_##name(t_ecs_event_data_##name* data) { \
@@ -97,4 +97,4 @@
 		ECS_VEC_ITER(event->listeners, t_ecs_event_listener_##name, { \
 			_item.callback(data, _item.data); \
 		}); \
-	} \
+	}

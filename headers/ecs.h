@@ -18,8 +18,11 @@
 
 // ╔═════════════════════════[ DEFINITION ]═════════════════════════╗
 
+typedef struct s_free_list {struct s_free_list *next;} t_free_list;
+
 typedef struct s_ecs
 {
+	t_free_list	*next_id;
 	u16			comp_sizes[ECS_ARCH_MAXCOMP];
 	u16			comp_count;
 	t_ecs_vec	entities;
@@ -33,6 +36,7 @@ typedef struct s_ecs
 # define ECS_DEFAULT (t_ecs) { \
 	.comp_sizes = {0}, \
 	.comp_count = 0, \
+	.next_id = NULL, \
 	.entities = {0}, \
 	.archetypes = {0}, \
 	.queries = {0}, \
@@ -47,20 +51,16 @@ typedef struct s_ecs
 } while (0)
 
 # define ECS_DESTROY(ecs) do { \
-	ECS_VEC_CLEAR_ALL((ecs).archetypes, ECS_ARCH_DESTROY(*(t_ecs_archetype *)_item);); \
-	ECS_VEC_CLEAR_ALL((ecs).queries, free(*(void **)_item);); \
+	ECS_VEC_CLEAR_ALL((ecs).archetypes, t_ecs_archetype, ECS_ARCH_DESTROY(*_item);); \
+	ECS_VEC_CLEAR_ALL((ecs).queries, void, free(_item);); \
 	ECS_VEC_DESTROY((ecs).archetypes); \
 	ECS_VEC_DESTROY((ecs).queries); \
 	ECS_VEC_DESTROY((ecs).entities); \
 	(ecs) = ECS_DEFAULT; \
 } while (0)
 
-# define ECS_ENTITY_ALIVE(id) ({ \
-	int _alive = 0; \
-	if (__ECS_VEC_EXPECT_IN((ecs).entities, id)) \
-		_alive = (((u64 *)(ecs).entities)[id] & ECS_MASK_ALIVE) != 0; \
-	alive; \
-})
+# define ECS_ENTITY_ALIVE(id) \
+	__builtin_expect((ECS_VEC_GET((ecs).entities, id, u64) & ECS_MASK_ALIVE) != 0, 1)
 
 # define ECS_ENTITY_CREATE(ecs) ({ \
 	u64 _id = (ecs).entities.len; \
