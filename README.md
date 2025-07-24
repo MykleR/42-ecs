@@ -29,7 +29,7 @@ Example use in [so_long](https://github.com/MykleR/so_long) (more to come).
 
 ## 🚀 Basic Usage
 
-#### Exaple Setup
+#### Example Setup
 ```c
 #include <ecs.h>
 
