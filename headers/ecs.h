@@ -108,18 +108,15 @@ typedef struct s_ecs
 	t_ecs_query_result _result = ECS_QUERY_DEFAULT; \
 	_result.signature = _signature; \
 	ECS_VEC_INIT(_result.entities, u32, ECS_INITSIZE); \
-	ECS_VEC_FOREACH((ecs).archetypes, t_ecs_archetype, { \
-		if ((_item->signature & _signature) == _signature) { \
-			ECS_VEC_FOREACH(_item->ids, u32, { \
-				u32 _entity_id = *_item; \
-				if (ECS_VEC_IN((ecs).entities, _entity_id) && \
-					(ECS_VEC_GET((ecs).entities, _entity_id, u64) & ECS_MASK_ALIVE)) { \
-					ECS_VEC_PUSH(_result.entities, _entity_id); \
-					_result.count++; \
-				} \
-			}); \
+	/* Scan entities directly for now - TODO: use archetypes */ \
+	for (u32 _entity_id = 0; _entity_id < (ecs).entities.len; _entity_id++) { \
+		u64 _entity_sig = ECS_VEC_GET((ecs).entities, _entity_id, u64); \
+		if ((_entity_sig & ECS_MASK_ALIVE) && \
+			((_entity_sig & _signature) == _signature)) { \
+			ECS_VEC_PUSH(_result.entities, _entity_id); \
+			_result.count++; \
 		} \
-	}); \
+	} \
 	_result; \
 })
 
@@ -129,7 +126,8 @@ typedef struct s_ecs
 	u64 _entity_sig = ECS_VEC_GET((ecs).entities, entity_id, u64); \
 	if (!(_entity_sig & ECS_MASK_ALIVE)) break; \
 	u64 _new_sig = (_entity_sig & ~ECS_MASK_ALIVE) | (1ULL << (comp_id)) | ECS_MASK_ALIVE; \
-	__ECS_ENTITY_MOVE_TO_ARCHETYPE(ecs, entity_id, _new_sig, comp_id, data, 1); \
+	ECS_VEC_SET((ecs).entities, entity_id, &_new_sig); \
+	/* TODO: Store component data in archetype */ \
 } while (0)
 
 # define ECS_ENTITY_REMOVE(ecs, entity_id, comp_id) do { \
@@ -138,8 +136,20 @@ typedef struct s_ecs
 	u64 _entity_sig = ECS_VEC_GET((ecs).entities, entity_id, u64); \
 	if (!(_entity_sig & ECS_MASK_ALIVE)) break; \
 	u64 _new_sig = (_entity_sig & ~ECS_MASK_ALIVE & ~(1ULL << (comp_id))) | ECS_MASK_ALIVE; \
-	__ECS_ENTITY_MOVE_TO_ARCHETYPE(ecs, entity_id, _new_sig, comp_id, NULL, 0); \
+	ECS_VEC_SET((ecs).entities, entity_id, &_new_sig); \
+	/* TODO: Remove component data from archetype */ \
 } while (0)
+
+# define ECS_ENTITY_HAS(ecs, entity_id, comp_id) ({ \
+	u8 _has = 0; \
+	if (ECS_VEC_IN((ecs).entities, entity_id)) { \
+		u64 _entity_sig = ECS_VEC_GET((ecs).entities, entity_id, u64); \
+		if ((_entity_sig & ECS_MASK_ALIVE) && (_entity_sig & (1ULL << (comp_id)))) { \
+			_has = 1; \
+		} \
+	} \
+	_has; \
+})
 
 // ╔═══════════════════════════[ UTILS ]════════════════════════════╗
 
@@ -147,14 +157,19 @@ typedef struct s_ecs
 # define __ECS_INIT_COMP(ARG) \
 	(ecs).comp_sizes[(ecs).comp_count++] = sizeof(ARG); \
 
-# define __ECS_BUILD_SIGNATURE(...) \
-	(__ECS_SIGNATURE_OR(0, ##__VA_ARGS__))
+# define __ECS_BUILD_SIGNATURE_IMPL_1(a) (1ULL << (a))
+# define __ECS_BUILD_SIGNATURE_IMPL_2(a,b) ((1ULL << (a)) | (1ULL << (b)))  
+# define __ECS_BUILD_SIGNATURE_IMPL_3(a,b,c) ((1ULL << (a)) | (1ULL << (b)) | (1ULL << (c)))
 
-# define __ECS_SIGNATURE_OR(acc, comp, ...) \
-	IF(NOT_EMPTY(__VA_ARGS__))( \
-		__ECS_SIGNATURE_OR((acc) | (1ULL << (comp)), ##__VA_ARGS__), \
-		(acc) | (1ULL << (comp)) \
-	)
+# define __ECS_BUILD_SIGNATURE_EXPAND(...) EXPAND(__ECS_BUILD_SIGNATURE_SELECT(__VA_ARGS__, \
+	__ECS_BUILD_SIGNATURE_IMPL_3, \
+	__ECS_BUILD_SIGNATURE_IMPL_2, \
+	__ECS_BUILD_SIGNATURE_IMPL_1, \
+	)(__VA_ARGS__))
+
+# define __ECS_BUILD_SIGNATURE_SELECT(arg1, arg2, arg3, arg4, ...) arg4
+
+# define __ECS_BUILD_SIGNATURE(...) __ECS_BUILD_SIGNATURE_EXPAND(__VA_ARGS__)
 
 # define __ECS_DEQUEUE(ecs) { \
 	_id = ((u64*)(ecs).next_id - (u64*)(ecs).entities.data); \

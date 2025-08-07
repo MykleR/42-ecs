@@ -5,6 +5,10 @@ tests/
 .objs/
 .cache/
 
+# Test executables
+test
+test_*
+
 # Object files
 *.o
 *.ko
