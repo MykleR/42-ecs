@@ -48,19 +48,19 @@ int main() {
 
 	// Test querying
 	LOG_INFO("Querying entities with Position component (bit 0)");
-	t_ecs_query_result query_pos = ECS_QUERY(ecs, 0);
+	t_ecs_query query_pos = ECS_QUERY(ecs, 0);
 	LOG_INFO("Found %lu entities with Position", query_pos.count);
 	for (u64 i = 0; i < query_pos.count; i++) {
 		u32 entity_id = ECS_VEC_GET(query_pos.entities, i, u32);
-		LOG_INFO("  Entity %u has Position", entity_id);
+		LOG_INFO("  Entity %lu has Position", (u64)entity_id);
 	}
 
 	LOG_INFO("Querying entities with Position AND Velocity (bits 0,1)");
-	t_ecs_query_result query_pos_vel = ECS_QUERY(ecs, 0, 1);
+	t_ecs_query query_pos_vel = ECS_QUERY(ecs, 0, 1);
 	LOG_INFO("Found %lu entities with Position+Velocity", query_pos_vel.count);
 	for (u64 i = 0; i < query_pos_vel.count; i++) {
 		u32 entity_id = ECS_VEC_GET(query_pos_vel.entities, i, u32);
-		LOG_INFO("  Entity %u has Position+Velocity", entity_id);
+		LOG_INFO("  Entity %lu has Position+Velocity", (u64)entity_id);
 	}
 
 	// Test getting component data
