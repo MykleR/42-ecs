@@ -49,9 +49,20 @@ typedef struct s_ecs_archetype
 // TODO : FETCH with correct index and type in data
 # define ECS_ARCH_GET(arch, comp_id, entity_id) ({ \
 	void *_data = NULL; \
-	for (u64 _i = 0; _i < (arch).ids.len; _i++) { \
-		if (ECS_VEC_GET((arch).ids, _i, u32) == (u32)(entity_id)) { \
-			_data = __ECS_VEC_PTR((arch).comp_datas[comp_id], _i); \
+	/* Find entity index in archetype */ \
+	for (u64 _entity_idx = 0; _entity_idx < (arch).ids.len; _entity_idx++) { \
+		if (ECS_VEC_GET((arch).ids, _entity_idx, u32) == (u32)(entity_id)) { \
+			/* Map global component ID to archetype component index */ \
+			u16 _archetype_comp_idx = 0; \
+			for (u16 _global_comp_id = 0; _global_comp_id < 64; _global_comp_id++) { \
+				if ((arch).signature & (1ULL << _global_comp_id)) { \
+					if (_global_comp_id == comp_id) { \
+						_data = __ECS_VEC_PTR((arch).comp_datas[_archetype_comp_idx], _entity_idx); \
+						break; \
+					} \
+					_archetype_comp_idx++; \
+				} \
+			} \
 			break; \
 		} \
 	} \
@@ -89,9 +100,9 @@ typedef struct s_ecs_archetype
 	__ECS_ADD_TO_ARCHETYPE(ecs, entity_id, _new_sig_temp & ~ECS_MASK_ALIVE, comp_id, data, is_add); \
 } while (0)
 
-# define __ECS_REMOVE_FROM_ARCHETYPE(ecs, entity_id, signature) do { \
+# define __ECS_REMOVE_FROM_ARCHETYPE(ecs, entity_id, sig) do { \
 	ECS_VEC_FOREACH((ecs).archetypes, t_ecs_archetype, { \
-		if (_item->signature == signature) { \
+		if (_item->signature == sig) { \
 			/* Find and remove entity from this archetype */ \
 			for (u64 _arch_i = 0; _arch_i < _item->ids.len; _arch_i++) { \
 				if (ECS_VEC_GET(_item->ids, _arch_i, u32) == (u32)(entity_id)) { \
@@ -109,17 +120,17 @@ typedef struct s_ecs_archetype
 	}); \
 } while (0)
 
-# define __ECS_ADD_TO_ARCHETYPE(ecs, entity_id, signature, comp_id, data, is_add) do { \
+# define __ECS_ADD_TO_ARCHETYPE(ecs, entity_id, sig, comp_id, data, is_add) do { \
 	t_ecs_archetype *_target_arch = NULL; \
 	/* Find existing archetype */ \
 	ECS_VEC_FOREACH((ecs).archetypes, t_ecs_archetype, { \
-		if (_item->signature == signature) { \
+		if (_item->signature == sig) { \
 			_target_arch = _item; break; \
 		} \
 	}); \
 	/* Create new archetype if not found */ \
 	if (!_target_arch) { \
-		__ECS_CREATE_ARCHETYPE(ecs, signature); \
+		__ECS_CREATE_ARCHETYPE(ecs, sig); \
 		_target_arch = (t_ecs_archetype*)__ECS_VEC_PTR((ecs).archetypes, (ecs).archetypes.len - 1); \
 	} \
 	/* Add entity to archetype */ \
@@ -129,7 +140,7 @@ typedef struct s_ecs_archetype
 	/* Add component data */ \
 	u16 _archetype_comp_idx = 0; \
 	for (u16 _global_comp_id = 0; _global_comp_id < (ecs).comp_count; _global_comp_id++) { \
-		if (signature & (1ULL << _global_comp_id)) { \
+		if (sig & (1ULL << _global_comp_id)) { \
 			__ECS_VEC_REALLOC(_target_arch->comp_datas[_archetype_comp_idx]); \
 			void *_comp_data_ptr = __ECS_VEC_PTR(_target_arch->comp_datas[_archetype_comp_idx], _target_arch->comp_datas[_archetype_comp_idx].len); \
 			if (is_add && _global_comp_id == comp_id && data != NULL) { \
@@ -144,12 +155,12 @@ typedef struct s_ecs_archetype
 	} \
 } while (0)
 
-# define __ECS_CREATE_ARCHETYPE(ecs, signature) do { \
+# define __ECS_CREATE_ARCHETYPE(ecs, sig) do { \
 	t_ecs_archetype _new_arch = ECS_ARCH_DEFAULT; \
-	_new_arch.signature = signature; \
+	_new_arch.signature = sig; \
 	/* Count components in signature */ \
 	for (u16 _i = 0; _i < (ecs).comp_count; _i++) { \
-		if (signature & (1ULL << _i)) { \
+		if (sig & (1ULL << _i)) { \
 			_new_arch.comp_sizes[_new_arch.comp_count] = (ecs).comp_sizes[_i]; \
 			ECS_VEC_INIT(_new_arch.comp_datas[_new_arch.comp_count], u8, ECS_ARCH_INITSIZE); \
 			_new_arch.comp_datas[_new_arch.comp_count].mem_size = (ecs).comp_sizes[_i]; \

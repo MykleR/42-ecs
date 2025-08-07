@@ -95,8 +95,9 @@ typedef struct s_ecs
 	void *_data = NULL; \
 	if (ECS_VEC_IN((ecs).entities, id)) { \
 		u64 _entity = ECS_VEC_GET((ecs).entities, id, u64); \
+		u64 _entity_sig = _entity & ~ECS_MASK_ALIVE; \
 		ECS_VEC_FOREACH((ecs).archetypes, t_ecs_archetype, { \
-			if (_item->signature == _entity) { \
+			if (_item->signature == _entity_sig) { \
 				_data = ECS_ARCH_GET(*_item, comp, id); break; \
 		}}); \
 	} \
@@ -108,15 +109,17 @@ typedef struct s_ecs
 	t_ecs_query _result = ECS_QUERY_DEFAULT; \
 	_result.signature = _signature; \
 	ECS_VEC_INIT(_result.entities, u32, ECS_INITSIZE); \
-	/* Scan entities directly for now - TODO: use archetypes */ \
-	for (u32 _entity_id = 0; _entity_id < (ecs).entities.len; _entity_id++) { \
-		u64 _entity_sig = ECS_VEC_GET((ecs).entities, _entity_id, u64); \
-		if ((_entity_sig & ECS_MASK_ALIVE) && \
-			((_entity_sig & _signature) == _signature)) { \
-			ECS_VEC_PUSH(_result.entities, _entity_id); \
-			_result.count++; \
+	/* Use archetypes for querying */ \
+	ECS_VEC_FOREACH((ecs).archetypes, t_ecs_archetype, { \
+		if ((_item->signature & _signature) == _signature) { \
+			/* This archetype contains all required components */ \
+			for (u64 _i = 0; _i < _item->ids.len; _i++) { \
+				u32 _entity_id = ECS_VEC_GET(_item->ids, _i, u32); \
+				ECS_VEC_PUSH(_result.entities, _entity_id); \
+				_result.count++; \
+			} \
 		} \
-	} \
+	}); \
 	_result; \
 })
 
