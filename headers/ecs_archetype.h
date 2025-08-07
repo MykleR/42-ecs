@@ -46,10 +46,16 @@ typedef struct s_ecs_archetype
 } while (0)
 
 // TODO : FETCH with correct index and type in data
-# define ECS_ARCH_GET(arch, comp_id, entity_id) ( \
-	assert(__ECS_VEC_EXPECT_IN((arch).ids, entity_id)), \
-	ECS_VEC_GET((arch).comp_datas[comp_id], 0, void *)) \
-)
+# define ECS_ARCH_GET(arch, comp_id, entity_id) ({ \
+	void *_data = NULL; \
+	for (u64 _i = 0; _i < (arch).ids.len; _i++) { \
+		if (ECS_VEC_GET((arch).ids, _i, u32) == (u32)(entity_id)) { \
+			_data = __ECS_VEC_PTR((arch).comp_datas[comp_id], _i); \
+			break; \
+		} \
+	} \
+	_data; \
+})
 
 // ╔═══════════════════════════[ UTILS ]════════════════════════════╗
 
