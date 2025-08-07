@@ -135,22 +135,31 @@ typedef struct s_ecs_archetype
 	} \
 	/* Add entity to archetype */ \
 	u32 _ent_id = (u32)(entity_id); \
-	ECS_VEC_PUSH(_target_arch->ids, _ent_id); \
-	_target_arch->count++; \
-	/* Add component data */ \
-	u16 _archetype_comp_idx = 0; \
-	for (u16 _global_comp_id = 0; _global_comp_id < (ecs).comp_count; _global_comp_id++) { \
-		if (sig & (1ULL << _global_comp_id)) { \
-			__ECS_VEC_REALLOC(_target_arch->comp_datas[_archetype_comp_idx]); \
-			void *_comp_data_ptr = __ECS_VEC_PTR(_target_arch->comp_datas[_archetype_comp_idx], _target_arch->comp_datas[_archetype_comp_idx].len); \
-			if (is_add && _global_comp_id == comp_id && data != NULL) { \
-				memcpy(_comp_data_ptr, data, _target_arch->comp_sizes[_archetype_comp_idx]); \
-			} else { \
-				/* Push zero data for other components */ \
-				memset(_comp_data_ptr, 0, _target_arch->comp_sizes[_archetype_comp_idx]); \
+	/* Check if entity is already in this archetype */ \
+	u8 _already_exists = 0; \
+	for (u64 _check_i = 0; _check_i < _target_arch->ids.len; _check_i++) { \
+		if (ECS_VEC_GET(_target_arch->ids, _check_i, u32) == _ent_id) { \
+			_already_exists = 1; break; \
+		} \
+	} \
+	if (!_already_exists) { \
+		ECS_VEC_PUSH(_target_arch->ids, _ent_id); \
+		_target_arch->count++; \
+		/* Add component data */ \
+		u16 _archetype_comp_idx = 0; \
+		for (u16 _global_comp_id = 0; _global_comp_id < (ecs).comp_count; _global_comp_id++) { \
+			if (sig & (1ULL << _global_comp_id)) { \
+				__ECS_VEC_REALLOC(_target_arch->comp_datas[_archetype_comp_idx]); \
+				void *_comp_data_ptr = __ECS_VEC_PTR(_target_arch->comp_datas[_archetype_comp_idx], _target_arch->comp_datas[_archetype_comp_idx].len); \
+				if (is_add && _global_comp_id == comp_id && data != NULL) { \
+					memcpy(_comp_data_ptr, data, _target_arch->comp_sizes[_archetype_comp_idx]); \
+				} else { \
+					/* Push zero data for other components */ \
+					memset(_comp_data_ptr, 0, _target_arch->comp_sizes[_archetype_comp_idx]); \
+				} \
+				_target_arch->comp_datas[_archetype_comp_idx].len++; \
+				_archetype_comp_idx++; \
 			} \
-			_target_arch->comp_datas[_archetype_comp_idx].len++; \
-			_archetype_comp_idx++; \
 		} \
 	} \
 } while (0)

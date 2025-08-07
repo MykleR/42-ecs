@@ -128,6 +128,8 @@ typedef struct s_ecs
 	if (!ECS_VEC_IN((ecs).entities, entity_id)) break; \
 	u64 _entity_sig = ECS_VEC_GET((ecs).entities, entity_id, u64); \
 	if (!(_entity_sig & ECS_MASK_ALIVE)) break; \
+	/* Check if entity already has this component */ \
+	if (_entity_sig & (1ULL << (comp_id))) break; \
 	u64 _new_sig = (_entity_sig & ~ECS_MASK_ALIVE) | (1ULL << (comp_id)) | ECS_MASK_ALIVE; \
 	ECS_VEC_SET((ecs).entities, entity_id, &_new_sig); \
 	/* Simple approach: just add to archetype for new signature */ \

@@ -40,3 +40,19 @@ typedef struct s_ecs_query
 # define __ECS_BUILD_SIGNATURE_SELECT(arg1, arg2, arg3, arg4, ...) arg4
 
 # define __ECS_BUILD_SIGNATURE(...) __ECS_BUILD_SIGNATURE_EXPAND(__VA_ARGS__)
+
+// Query caching helpers
+# define __ECS_FIND_CACHED_QUERY(ecs, signature) ({ \
+	t_ecs_query* _cached = NULL; \
+	ECS_VEC_FOREACH((ecs).queries, t_ecs_query*, { \
+		if ((*_item)->signature == signature) { \
+			_cached = *_item; break; \
+		} \
+	}); \
+	_cached; \
+})
+
+# define __ECS_CACHE_QUERY(ecs, query_ptr) do { \
+	t_ecs_query* _query_ptr = query_ptr; \
+	ECS_VEC_PUSH((ecs).queries, _query_ptr); \
+} while (0)
