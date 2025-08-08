@@ -1,28 +1,15 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: mrouves <marvin@42.fr>                     +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/10/08 18:27:35 by mrouves           #+#    #+#              #
-#    Updated: 2024/12/06 16:28:28 by mrouves          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME 			:= 42-ecs.a
 
 DIR_HEADERS		:= headers
 DIR_SOURCES		:= sources
 DIR_OBJS		:= .objs
-DIR_TESTS		:= unittests
 
 include $(DIR_SOURCES)/sources.mk
 
 OBJS			:= $(addprefix $(DIR_OBJS)/, $(SOURCES:%.c=%.o))
 
 CC				:= cc
-CFLAGS			:= -Wall -Wextra -Werror -g
+CFLAGS			:= -Wall -Wextra -Werror -O3
 IFLAGS			:= -I $(DIR_HEADERS)
 
 GREEN			= \033[0;32m
@@ -42,7 +29,7 @@ $(DIR_OBJS)/%.o: $(DIR_SOURCES)/%.c
 
 clean:
 	@rm -rf $(DIR_OBJS)
-	@printf "Cleaned $(BOLD)$(DIR_OBJS)$(END)\n"
+	@printf "Cleaned $(BOLD)$(DIR_OBJS)$(END) of $(NAME)\n"
 
 fclean: clean
 	@rm -f $(NAME)
