@@ -1,7 +1,7 @@
 #pragma once
 
-# include <ecs_vec.h>
-# include <pp_iter.h>
+# include "ecs_vec.h"
+# include "pp_iter.h"
 
 # ifndef ECS_ARCH_INITSIZE
 #  define ECS_ARCH_INITSIZE 0x100

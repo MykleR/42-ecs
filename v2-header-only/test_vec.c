@@ -1,5 +1,4 @@
-#include <ecs_vec.h>
-#include <ecs_log.h>
+#include "ecs_vec.h"
 
 #define N 9900000
 
