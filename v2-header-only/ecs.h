@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ecs_vec.h>
-#include <ecs_archetype.h>
-#include <ecs_log.h>
-#include <ecs_event.h>
+#include "ecs_vec.h"
+#include "ecs_archetype.h"
+#include "ecs_utils.h"
+#include "ecs_event.h"
 
 # ifndef ECS_ENTITY_MAX
 #  define ECS_ENTITY_MAX 0x100000

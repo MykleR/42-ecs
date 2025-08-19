@@ -1,7 +1,6 @@
 #pragma once
 
-# include <stdint.h>
-# include <ecs_vec.h>
+# include "ecs_vec.h"
 
 // ╔═══════════════════════════[ MACROS ]═══════════════════════════╗
 
