@@ -130,14 +130,12 @@ typedef struct s_ecs
 } while (0)
 
 
-# ifndef NDEBUG
-#  define __ECS_ASSERT_MSG(cond, msg) assert(cond && msg)
-# else
-#  define __ECS_ASSERT_MSG(cond, msg) ((void)0)
-# endif
-# define __ECS_ASSERT_INIT(ecs)			__ECS_ASSERT_MSG(ECS_IS_INIT(ecs), "ECS is not initialized")
-# define __ECS_ASSERT_NOT_INIT(ecs)		__ECS_ASSERT_MSG(ECS_NOT_INIT(ecs), "ECS is already initialized")
-# define __ECS_ASSERT_NOT_EMPTY(ecs)	__ECS_ASSERT_MSG(ECS_NOT_EMPTY(ecs), "ECS is empty")
+# define __ECS_ASSERT_INIT(ecs)	\
+	ASSERT_MSG(ECS_IS_INIT(ecs), "%s", "ECS is not initialized")
+# define __ECS_ASSERT_NOT_INIT(ecs)	\
+	ASSERT_MSG(ECS_NOT_INIT(ecs), "%s", "ECS is already initialized")
+# define __ECS_ASSERT_NOT_EMPTY(ecs) \
+	ASSERT_MSG(ECS_NOT_EMPTY(ecs), "%s", "ECS is empty")
 
 // const t_query	*ecs_query(t_ecs *ecs, uint64_t signature);
 

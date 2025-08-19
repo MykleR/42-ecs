@@ -45,8 +45,10 @@ typedef int_fast8_t		i8;
 
 
 # ifndef NDEBUG
-#  define ASSERT_MSG(cond, msg, ...) for (; !(cond); assert(cond)) { \
-	LOG_ERR("Assertion failed: " msg, ##__VA_ARGS__);}
+#  define ASSERT_MSG(cond, msg, ...) \
+	for (; !(cond); assert(cond)) { \
+		LOG_ERR("Assertion failed, in %s line %d: " msg, \
+			__FILE__, __LINE__, ##__VA_ARGS__); }
 # else
 #  define ASSERT_MSG(cond, msg, ...) ((void)0)
 # endif
