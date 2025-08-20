@@ -3,6 +3,7 @@ TARGET 			:= tests
 DIR_HEADERS		:= .
 DIR_SOURCES		:= unittests
 DIR_OBJECTS		:= .objs
+DIR_LIB			:= utest.h
 
 SOURCES			:= $(wildcard $(DIR_SOURCES)/*.c)
 OBJECTS			:= $(SOURCES:%.c=$(DIR_OBJECTS)/%.o)
@@ -10,7 +11,7 @@ DEPENDENCIES	:= $(OBJECTS:.o=.d)
 
 CC				:= cc
 CFLAGS			:= -Wall -Wextra -Werror -O3
-IFLAGS			:= -I $(DIR_HEADERS)
+IFLAGS			:= -I $(DIR_HEADERS) -I $(DIR_LIB)
 
 DIR_DUP			= mkdir -p $(@D)
 
