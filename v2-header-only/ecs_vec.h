@@ -1,11 +1,5 @@
 #pragma once
 
-# include <stdbool.h>
-# include <stdint.h>
-# include <stdlib.h>
-# include <string.h>
-# include <assert.h>
-
 # include "ecs_utils.h"
 
 # ifndef ECS_VEC_MAXCAP
@@ -65,8 +59,6 @@ typedef struct s_ecs_vec {
 
 // ----- MODIFIERS -----
 
-#define ECS_VEC_CLEAR(vec) (vec).len = 0
-
 #define ECS_VEC_SET(vec, index, value) do {                                    \
 	__VEC_ASSERT_INIT(vec);                                                    \
 	__VEC_ASSERT_IN(vec, index);                                               \
@@ -79,37 +71,40 @@ typedef struct s_ecs_vec {
 	memcpy(__ECS_VEC_PTR(vec, (vec).len++), &(value), (vec).mem_size);         \
 } while (0)
 
-#define ECS_VEC_POP(vec, ...) do {                                             \
-	__ECS_VEC_DELONE(vec, (vec).len-1, __VA_ARGS__)                            \
-} while (0)
+#define ECS_VEC_POP(vec, ...)                                                  \
+	__ECS_VEC_DELONE(vec, (vec).len-1, __VA_ARGS__)
 
-#define ECS_VEC_REMOVE(vec, index, ...) do {                                   \
-	__ECS_VEC_DELONE(vec, index, __VA_ARGS__)                                  \
-} while (0)
+#define ECS_VEC_REMOVE(vec, index, ...)                                        \
+	__ECS_VEC_DELONE(vec, index, __VA_ARGS__)
+
+#define ECS_VEC_CLEAR(vec) (vec).len = 0
 
 // ----- ITERATORS -----
 
 #define ECS_VEC_FOREACH(vec, type, ...) do {                                   \
+	__VEC_ASSERT_INIT(vec);                                                    \
     type *__ptr = (type *)(vec).data;                                          \
     type *const __end = __ptr + (vec).len;                                     \
     for (; __ptr < __end; ++__ptr) {                                           \
-        type *const _item = __ptr;                                             \
+        type *const UNUSED _item = __ptr;                                             \
         {__VA_ARGS__}                                                          \
     }                                                                          \
 } while (0)
 
 #define ECS_VEC_ITER(vec, type, ...) do {                                      \
+	__VEC_ASSERT_INIT(vec);                                                    \
 	type *const __data = (type *)(vec).data;                                   \
 	for (u64 it = 0; it < (vec).len; ++it) {                                   \
-		type _item = *(__data + it);                                           \
+		type UNUSED _item = *(__data + it);                                           \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
 } while (0)
 
 #define ECS_VEC_ITER_ALL(vec, type, ...) do {                                  \
+	__VEC_ASSERT_INIT(vec);                                                    \
 	type *const __data = (type *)(vec).data;                                   \
 	for (u64 it = 0; it < (vec).cap; ++it) {                                   \
-		type _item = *(__data + it);                                           \
+		type UNUSED _item = *(__data + it);                                           \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
 } while (0)
@@ -132,7 +127,7 @@ typedef struct s_ecs_vec {
 		(vec).data = realloc((vec).data, (vec).cap * (vec).mem_size);          \
 	} __VEC_ASSERT_REALLOC(vec);
 
-# define __ECS_VEC_DELONE(vec, index, ...)                                     \
+# define __ECS_VEC_DELONE(vec, index, ...) do {                                \
 	u64 _index = (u64)(index);                                                 \
 	__VEC_ASSERT_INIT(vec);                                                    \
 	__VEC_ASSERT_IN(vec, _index);                                              \
@@ -140,8 +135,15 @@ typedef struct s_ecs_vec {
 	--(vec).len;                                                               \
 	{__VA_ARGS__}                                                              \
 	if (ECS_VEC_IN(vec, _index))                                               \
-		memcpy(_item, __ECS_VEC_PTR(vec, (vec).len), (vec).mem_size);
+		memcpy(_item, __ECS_VEC_PTR(vec, (vec).len), (vec).mem_size);          \
+} while (0)
 
+# define __ECS_VEC_LOG(vec) do {                                               \
+	LOG_DEBUG("Vector: %p", (vec).data);                                       \
+	LOG_DEBUG(" - Capacity: %lu", (vec).cap);                                    \
+	LOG_DEBUG(" - Length: %lu", (vec).len);                                      \
+	LOG_DEBUG(" - Mem Size: %lu", (vec).mem_size);                               \
+} while (0)
 
 # define __VEC_ASSERT_INIT(vec)	                                               \
 	ASSERT_MSG(ECS_VEC_IS_INIT(vec), "%s", "Vector not initialized")
