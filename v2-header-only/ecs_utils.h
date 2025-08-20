@@ -1,7 +1,10 @@
 #pragma once
 
 # include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
 # include <stdint.h>
+# include <assert.h>
 
 typedef uint64_t		u64;
 typedef uint_fast32_t	u32;
@@ -29,10 +32,12 @@ typedef int_fast8_t		i8;
 # define 	COLOR(C, X)			C X RESET
 
 # ifndef NVERBOSE
+#  define LOG_NL() fprintf(stderr, "\n")
 #  define __LOG(c, t, msg, ...)	\
 	fprintf(stderr, BOLD(COLOR(c,"%8s")) " > " msg "\n", t, ##__VA_ARGS__)
 # else
-#  define __LOG(c, t, msg, ...)
+#  define LOG_NL() ((void)0)
+#  define __LOG(c, t, msg, ...) ((void)0)
 # endif
 
 # define LOG_DEBUG(msg, ...)		__LOG(BLUE,		"debug: ", msg, ##__VA_ARGS__)
@@ -45,10 +50,12 @@ typedef int_fast8_t		i8;
 
 
 # ifndef NDEBUG
+#  define __LOG_ASSERT(c, t, msg, ...)	\
+	fprintf(stderr, BOLD(COLOR(c,"%8s")) " > " msg "\n", t, ##__VA_ARGS__)
 #  define ASSERT_MSG(cond, msg, ...) \
 	for (; !(cond); assert(cond)) { \
-		LOG_ERR("Assertion failed, in %s line %d: " msg, \
-			__FILE__, __LINE__, ##__VA_ARGS__); }
+		__LOG_ASSERT(RED, "assert: ", "Failed line %d in %s: " msg, \
+			__LINE__, __FILE__, ##__VA_ARGS__); }
 # else
 #  define ASSERT_MSG(cond, msg, ...) ((void)0)
 # endif
