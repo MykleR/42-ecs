@@ -86,7 +86,7 @@ typedef struct s_ecs_vec {
     type *__ptr = (type *)(vec).data;                                          \
     type *const __end = __ptr + (vec).len;                                     \
     for (; __ptr < __end; ++__ptr) {                                           \
-        type *const UNUSED _item = __ptr;                                             \
+        type *const UNUSED _item = __ptr;									   \
         {__VA_ARGS__}                                                          \
     }                                                                          \
 } while (0)
@@ -95,18 +95,18 @@ typedef struct s_ecs_vec {
 	__VEC_ASSERT_INIT(vec);                                                    \
 	type *const __data = (type *)(vec).data;                                   \
 	for (u64 it = 0; it < (vec).len; ++it) {                                   \
-		type UNUSED _item = *(__data + it);                                           \
+		type UNUSED _item = *(__data + it);                                    \
 		{__VA_ARGS__}                                                          \
 	}                                                                          \
 } while (0)
 
-#define ECS_VEC_ITER_ALL(vec, type, ...) do {                                  \
-	__VEC_ASSERT_INIT(vec);                                                    \
-	type *const __data = (type *)(vec).data;                                   \
-	for (u64 it = 0; it < (vec).cap; ++it) {                                   \
-		type UNUSED _item = *(__data + it);                                           \
-		{__VA_ARGS__}                                                          \
-	}                                                                          \
+#define ECS_VEC_ITER_ALL(vec, type, ...) do {									\
+	__VEC_ASSERT_INIT(vec);														\
+	type *const __data = (type *)(vec).data;									\
+	for (u64 it = 0; it < (vec).cap; ++it) {									\
+		type UNUSED _item = *(__data + it);										\
+		{__VA_ARGS__}															\
+	}																			\
 } while (0)
 
 #define ECS_VEC_CLEAR_ALL(vec, type, ...) do {                                 \
