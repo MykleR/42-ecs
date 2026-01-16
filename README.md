@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=MykleR&repo=so_long&theme=dark&bg_color=30,090a0c,494d59\&title_color=fff\&text_color=fff)](https://github.com/MykleR/so_long)
+[![Readme Card](https://github-readme-stats-fast.vercel.app/api/pin/?username=MykleR&repo=so_long&theme=dark&bg_color=30,090a0c,494d59\&title_color=fff\&text_color=fff)](https://github.com/MykleR/so_long)
 
 ##
 
